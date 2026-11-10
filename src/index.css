@@ -1,0 +1,11 @@
+:root {
+  font-family: Inter, system-ui, sans-serif;
+  color: #12303f;
+  background: #f4f9fb;
+}
+body { margin: 0; }
+main { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
+h1 { color: #0b4f6c; margin-bottom: 4px; }
+.slogan { color: #2e6b4f; margin-top: 0; }
+.erreur { color: #a3172b; }
+li { padding: 4px 0; }

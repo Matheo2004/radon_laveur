@@ -1,0 +1,10 @@
+{
+  "name": "Radon Laveur",
+  "short_name": "Radon Laveur",
+  "description": "Ramassons main dans la main : le Strava des déchets de la rade de Brest",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F9FB",
+  "theme_color": "#0B4F6C"
+}

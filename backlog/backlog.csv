@@ -1,0 +1,18 @@
+rang,id,titre,histoire,points,moscow,sprint
+1,T01,Socle technique : dépôt / CI / déploiement,"En tant qu'équipe, je veux un dépôt, une intégration continue et un déploiement automatique, afin de livrer dès le sprint 1.",3,Must,1
+2,T02,Zones du littoral saisies,"En tant qu'équipe, je veux saisir les zones du littoral de Plouzané à Plougastel-Daoulas, afin d'avoir des zones à proposer.",1,Must,1
+3,US01,Compte et profil étudiant,"En tant qu'étudiant, je veux créer un compte et un profil (pseudo, école), afin de participer et d'apparaître au classement.",3,Must,1
+4,US06a,Déclarer un ramassage avec photo et choix de la zone,"En tant qu'étudiant, je veux déclarer mon ramassage avec une photo, en choisissant la zone dans une liste, afin de prouver que j'ai ramassé.",5,Must,2
+5,US08,Gagner des points selon le poids validé,"En tant qu'étudiant, je veux gagner des points selon le poids validé, afin d'être récompensé de mon effort.",2,Must,2
+6,US07,Scanner le QR code du point de collecte et saisir le poids,"En tant qu'étudiant, je veux scanner le QR code du point de collecte et saisir le poids pesé, afin de faire valider le poids ramassé.",3,Must,3
+7,US06b,Vérifier la position GPS de la déclaration,"En tant qu'étudiant, je veux que ma position soit vérifiée sur le littoral de la rade, afin que ma déclaration soit acceptée.",3,Must,3
+8,US09,Classement des bénévoles,"En tant qu'étudiant, je veux voir le classement des bénévoles, afin de me comparer aux autres comme sur Strava.",2,Must,4
+9,US12,Catalogue des bons d'achat de la ville,"En tant qu'étudiant, je veux voir le catalogue des bons d'achat financés par la ville, afin de savoir ce que je peux gagner.",1,Must,4
+10,US13,Échanger ses points contre un bon d'achat,"En tant qu'étudiant, je veux échanger mes points contre un bon d'achat, afin d'obtenir ma récompense.",3,Must,4
+11,US02,Carte des zones à nettoyer,"En tant qu'étudiant, je veux voir sur une carte les zones du littoral à nettoyer, afin de choisir où aller ramasser.",5,Should,
+12,US05,Sortie de groupe,"En tant qu'étudiant, je veux créer ou rejoindre une sortie de groupe, afin de ramasser avec d'autres et rencontrer du monde.",5,Should,
+13,US14,Espace de la ville,"En tant qu'agent de la ville, je veux gérer le budget et les bons d'achat et voir les statistiques, afin de piloter le financement des récompenses.",8,Should,
+14,US10,Historique personnel,"En tant qu'étudiant, je veux voir mon historique (kg cumulés, sorties), afin de suivre ma progression.",2,Should,
+15,US11,Défis et badges,"En tant qu'étudiant, je veux relever des défis et gagner des badges, afin de rester motivé.",5,Could,
+16,US16,Sorties créées par les associations,"En tant qu'association, je veux créer une sortie et recruter des bénévoles, afin d'organiser mes sorties et gagner en visibilité.",5,Could,
+17,US15,Version simplifiée pour les retraités,"En tant que retraité, je veux une version simplifiée de l'application, afin de participer sans difficulté.",8,Could,
