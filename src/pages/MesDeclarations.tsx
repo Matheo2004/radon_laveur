@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { cheminPhoto, liensTemporaires } from '../photo'
 
 type Declaration = {
   id: number
@@ -20,6 +21,7 @@ type Props = { client: SupabaseClient; userId: string; onPeser: (declarationId: 
 export default function MesDeclarations({ client, userId, onPeser }: Props) {
   const [declarations, setDeclarations] = useState<Declaration[] | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
+  const [liens, setLiens] = useState<Record<string, string>>({})
 
   useEffect(() => {
     client
@@ -28,9 +30,13 @@ export default function MesDeclarations({ client, userId, onPeser }: Props) {
       .eq('profil_id', userId)
       .order('created_at', { ascending: false })
       .limit(20)
-      .then(({ data, error }) => {
-        if (error) setErreur(error.message)
-        else setDeclarations((data ?? []) as unknown as Declaration[])
+      .then(async ({ data, error }) => {
+        if (error) return setErreur(error.message)
+        const liste = (data ?? []) as unknown as Declaration[]
+        setDeclarations(liste)
+        // Photos privées : on demande des liens temporaires pour les afficher.
+        const chemins = liste.flatMap((d) => (d.photo_url ? [cheminPhoto(d.photo_url)] : []))
+        setLiens(await liensTemporaires(client, chemins))
       })
   }, [client, userId])
 
@@ -42,7 +48,9 @@ export default function MesDeclarations({ client, userId, onPeser }: Props) {
     <ul className="declarations">
       {declarations.map((d) => (
         <li key={d.id} className="declaration">
-          {d.photo_url && <img src={d.photo_url} alt="" loading="lazy" />}
+          {d.photo_url && liens[cheminPhoto(d.photo_url)] && (
+            <img src={liens[cheminPhoto(d.photo_url)]} alt="" loading="lazy" />
+          )}
           <div>
             <p className="zone-nom">
               <strong>{d.zone?.code}</strong> {d.zone?.nom}

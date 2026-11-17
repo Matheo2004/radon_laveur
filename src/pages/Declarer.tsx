@@ -1,5 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { nettoyerPhoto } from '../photo'
 
 type Zone = { id: number; code: string; nom: string; commune: string; latitude: number; longitude: number; longueur_km: number | null }
 type Position = { latitude: number; longitude: number; precision: number }
@@ -22,7 +23,7 @@ type Props = {
   onAnnuler: () => void
 }
 
-const TAILLE_MAX = 10 * 1024 * 1024 // 10 Mo, comme la limite du bucket
+const TAILLE_MAX = 25 * 1024 * 1024 // 25 Mo avant compression (la photo envoyée fait ensuite quelques centaines de Ko)
 
 // US06a : l'étudiant choisit la zone, prend une photo et envoie sa déclaration.
 // La déclaration part « en attente » : le poids et la validation viendront de la pesée (US07).
@@ -92,7 +93,7 @@ export default function Declarer({ client, userId, onTermine, onAnnuler }: Props
       return
     }
     if (fichier && fichier.size > TAILLE_MAX) {
-      setErreur('Photo trop lourde : 10 Mo maximum.')
+      setErreur('Photo trop lourde : 25 Mo maximum.')
       return
     }
     setPhoto(fichier)
@@ -113,17 +114,26 @@ export default function Declarer({ client, userId, onTermine, onAnnuler }: Props
     setErreur(null)
     setEnvoi(true)
 
-    // 1. La photo va dans le dossier de l'étudiant : photos/<id>/<identifiant unique>.<ext>
-    const extension = photo.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const chemin = `${userId}/${crypto.randomUUID()}.${extension}`
-    const envoiPhoto = await client.storage.from('photos').upload(chemin, photo, { contentType: photo.type })
+    // 1. RGPD : métadonnées (GPS, téléphone) effacées et photo compressée avant l'envoi.
+    let photoNettoyee: Blob
+    try {
+      photoNettoyee = await nettoyerPhoto(photo)
+    } catch (e) {
+      setEnvoi(false)
+      return setErreur((e as Error).message)
+    }
+
+    // 2. La photo va dans le dossier privé de l'étudiant : photos/<id>/<identifiant unique>.jpg
+    const chemin = `${userId}/${crypto.randomUUID()}.jpg`
+    const envoiPhoto = await client.storage.from('photos').upload(chemin, photoNettoyee, { contentType: 'image/jpeg' })
     if (envoiPhoto.error) {
       setEnvoi(false)
       return setErreur(`Envoi de la photo impossible : ${envoiPhoto.error.message}`)
     }
-    const photoUrl = client.storage.from('photos').getPublicUrl(chemin).data.publicUrl
+    // Bucket privé : on enregistre le chemin, pas une adresse publique.
+    const photoUrl = chemin
 
-    // 2. La déclaration : seules ces colonnes sont autorisées depuis le navigateur (statut et poids restent côté serveur).
+    // 3. La déclaration : seules ces colonnes sont autorisées depuis le navigateur (statut et poids restent côté serveur).
     const { error } = await client
       .from('declaration')
       .insert({
@@ -166,6 +176,7 @@ export default function Declarer({ client, userId, onTermine, onAnnuler }: Props
           {/* capture="environment" ouvre directement l'appareil photo arrière sur téléphone */}
           <input type="file" accept="image/*" capture="environment" onChange={choisirPhoto} />
         </label>
+        <p className="aide">Photographie les déchets, pas les personnes (visages, plaques d'immatriculation).</p>
         {apercu && <img className="apercu" src={apercu} alt="Aperçu de la photo du ramassage" />}
 
         {erreur && <p className="erreur" role="alert">{erreur}</p>}
