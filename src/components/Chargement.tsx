@@ -1,8 +1,34 @@
+import { useEffect, useState } from 'react'
+
+// Messages qui défilent sur l'écran de démarrage, pendant que la barre se remplit.
+const ETAPES = [
+  'Le raton laveur enfile ses gants…',
+  'Il attrape son balai…',
+  'Il chasse les déchets de la plage…',
+  'Encore un petit coup de balai…',
+  'Place nette, on y va !',
+]
+
+type Props = {
+  texte?: string
+  // Écran de démarrage : grand raton, messages qui défilent et barre de progression sur `duree` ms.
+  duree?: number
+}
+
 // Écran d'attente : notre mascotte, un raton laveur, passe le balai sur la plage
 // pendant que les données arrivent. Dessin SVG fait main, animé en CSS (voir .raton dans index.css).
-export default function Chargement({ texte = 'Le raton laveur fait place nette…' }: { texte?: string }) {
+export default function Chargement({ texte = 'Le raton laveur fait place nette…', duree }: Props) {
+  const [etape, setEtape] = useState(0)
+
+  useEffect(() => {
+    if (!duree) return
+    const pas = duree / ETAPES.length
+    const minuteur = window.setInterval(() => setEtape((e) => Math.min(e + 1, ETAPES.length - 1)), pas)
+    return () => window.clearInterval(minuteur)
+  }, [duree])
+
   return (
-    <div className="chargement" role="status" aria-live="polite">
+    <div className={`chargement ${duree ? 'demarrage' : ''}`} role="status" aria-live="polite">
       <svg className="raton" viewBox="0 0 220 110" aria-hidden="true">
         {/* Sable */}
         <path className="raton-sable" d="M0,96 Q55,90 110,96 T220,96 L220,110 L0,110 Z" />
@@ -61,7 +87,18 @@ export default function Chargement({ texte = 'Le raton laveur fait place nette�
           <rect x="140" y="80" width="21" height="5" rx="2" fill="#2e8b57" transform="rotate(-6 150 82)" />
         </g>
       </svg>
-      <p>{texte}</p>
+      {duree ? (
+        <>
+          <p key={etape} className="etape">
+            {ETAPES[etape]}
+          </p>
+          <div className="progression" aria-hidden="true">
+            <div className="progression-barre" style={{ animationDuration: `${duree}ms` }} />
+          </div>
+        </>
+      ) : (
+        <p>{texte}</p>
+      )}
     </div>
   )
 }

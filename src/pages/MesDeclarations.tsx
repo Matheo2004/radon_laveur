@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { cheminPhoto, liensTemporaires } from '../photo'
 import Chargement from '../components/Chargement'
+import { useDelaiMinimum } from '../useDelaiMinimum'
 
 type Declaration = {
   id: number
@@ -22,6 +23,7 @@ type Props = { client: SupabaseClient; userId: string; onPeser: (declarationId: 
 export default function MesDeclarations({ client, userId, onPeser }: Props) {
   const [declarations, setDeclarations] = useState<Declaration[] | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
+  const delai = useDelaiMinimum()
   const [liens, setLiens] = useState<Record<string, string>>({})
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export default function MesDeclarations({ client, userId, onPeser }: Props) {
   }, [client, userId])
 
   if (erreur) return <p className="erreur">Impossible de charger tes déclarations : {erreur}</p>
-  if (declarations === null) return <Chargement texte="Le raton laveur trie tes ramassages…" />
+  if (declarations === null || !delai) return <Chargement texte="Le raton laveur trie tes ramassages…" />
   if (declarations.length === 0) return <p className="aide">Pas encore de ramassage déclaré : à toi de jouer !</p>
 
   return (

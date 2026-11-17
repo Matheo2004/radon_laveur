@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Confettis from '../components/Confettis'
 import Chargement from '../components/Chargement'
+import { useDelaiMinimum } from '../useDelaiMinimum'
 
 type Bon = {
   id: number
@@ -22,6 +23,7 @@ type Props = { client: SupabaseClient; points: number | null; onEchange?: () => 
 export default function Catalogue({ client, points, onEchange, onRetour }: Props) {
   const [bons, setBons] = useState<Bon[] | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
+  const delai = useDelaiMinimum() // le raton laveur a le temps de passer le balai
   const [enCours, setEnCours] = useState<number | null>(null)
   const [obtenu, setObtenu] = useState<{ titre: string; code: string } | null>(null)
   const [version, setVersion] = useState(0) // relance le chargement après un échange (stock à jour)
@@ -74,11 +76,11 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
         </div>
       )}
       {erreur && <p className="erreur" role="alert">{erreur}</p>}
-      {bons === null && !erreur && <Chargement texte="Le raton laveur dépoussière les bons…" />}
-      {bons?.length === 0 && <p className="aide">Pas encore de bons disponibles.</p>}
+      {(bons === null || !delai) && !erreur && <Chargement texte="Le raton laveur dépoussière les bons…" />}
+      {delai && bons?.length === 0 && <p className="aide">Pas encore de bons disponibles.</p>}
 
       <ul className="catalogue">
-        {bons?.map((b) => {
+        {delai && bons?.map((b) => {
           const manque = b.cout_points - (points ?? 0)
           return (
             <li key={b.id} className={manque <= 0 && b.stock > 0 ? 'accessible' : ''}>
