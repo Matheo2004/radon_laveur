@@ -1,11 +1,67 @@
 :root {
+  --bleu: #0b4f6c;
+  --vert: #2e8b57;
+  --orange: #f28c38;
+  --fond: #f4f9fb;
+  --texte: #12303f;
+  --bordure: #c9dbe3;
   font-family: Inter, system-ui, sans-serif;
-  color: #12303f;
-  background: #f4f9fb;
+  color: var(--texte);
+  background: var(--fond);
 }
-body { margin: 0; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); }
 main { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
-h1 { color: #0b4f6c; margin-bottom: 4px; }
+h1 { color: var(--bleu); margin-bottom: 4px; }
+h2 { color: var(--bleu); font-size: 1.2rem; }
 .slogan { color: #2e6b4f; margin-top: 0; }
 .erreur { color: #a3172b; }
+.info { color: #1f6b41; }
+.aide { color: #4a6573; font-size: 0.9rem; margin: 0; }
 li { padding: 4px 0; }
+
+.carte {
+  background: #fff;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.carte h2 { margin-top: 0; }
+
+form { display: flex; flex-direction: column; gap: 12px; }
+label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+
+/* Mobile d'abord : zones tactiles d'au moins 44 px, texte 16 px (pas de zoom iOS) */
+input, button {
+  min-height: 44px;
+  font: inherit;
+  font-size: 16px;
+  border-radius: 8px;
+}
+input {
+  padding: 8px 12px;
+  border: 1px solid var(--bordure);
+  font-weight: 400;
+  background: #fff;
+  color: var(--texte);
+}
+input:focus { outline: 2px solid var(--bleu); outline-offset: 1px; }
+button { padding: 8px 16px; cursor: pointer; border: 1px solid transparent; width: 100%; }
+button:disabled { opacity: 0.6; cursor: wait; }
+button.principal { background: var(--bleu); color: #fff; font-weight: 600; }
+button.secondaire { background: #fff; color: var(--bleu); border-color: var(--bleu); }
+button.lien { background: none; color: var(--bleu); text-decoration: underline; }
+
+.onglets { display: flex; gap: 8px; margin-bottom: 16px; }
+.onglets button { background: var(--fond); color: var(--bleu); border-color: var(--bordure); }
+.onglets button.actif { background: var(--bleu); color: #fff; border-color: var(--bleu); }
+
+.profil { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+.profil button { grid-column: 1 / -1; }
+.profil p { margin: 0; }
+.pseudo { font-size: 1.3rem; font-weight: 700; color: var(--bleu); }
+.points { color: var(--vert); }
+.points strong { font-size: 1.8rem; color: var(--orange); }
+
+.zones { padding-left: 20px; }
