@@ -6,8 +6,12 @@ import Connexion from './pages/Connexion'
 import ProfilForm from './pages/ProfilForm'
 import Accueil from './pages/Accueil'
 import Declarer from './pages/Declarer'
+import Classement from './pages/Classement'
 // Le lecteur de QR code est lourd : il n'est chargé qu'au moment de la pesée.
 const Pesee = lazy(() => import('./pages/Pesee'))
+
+// Pages accessibles depuis l'accueil.
+export type Page = 'accueil' | 'classement'
 
 // Choisit l'écran à afficher : connexion, création du profil ou accueil.
 // Convention : `undefined` = pas encore chargé, `null` = n'existe pas.
@@ -18,6 +22,7 @@ export default function App() {
   const [edition, setEdition] = useState(false)
   const [declarer, setDeclarer] = useState(false)
   const [pesee, setPesee] = useState<number | null>(null)
+  const [page, setPage] = useState<Page>('accueil')
 
   // Suit la session : appelé au démarrage, puis à chaque connexion ou déconnexion.
   useEffect(() => {
@@ -45,6 +50,7 @@ export default function App() {
     setEdition(false)
     setDeclarer(false)
     setPesee(null)
+    setPage('accueil')
     setErreurProfil(null)
     if (!userId) setProfil(undefined)
     else chargerProfil()
@@ -90,6 +96,9 @@ export default function App() {
         />
       )
     }
+    if (page === 'classement') {
+      return <Classement client={supabase} moi={profil} onRetour={() => setPage('accueil')} />
+    }
     return (
       <Accueil
         client={supabase}
@@ -97,6 +106,7 @@ export default function App() {
         onModifier={() => setEdition(true)}
         onDeclarer={() => setDeclarer(true)}
         onPeser={(id) => setPesee(id)}
+        onPage={setPage}
         onRafraichir={chargerProfil}
       />
     )
