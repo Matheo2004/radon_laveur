@@ -53,8 +53,8 @@ export default function Connexion({ client }: { client: SupabaseClient }) {
       const { data, error } = await client.auth.signUp({
         email,
         password: motDePasse,
-        // Le lien de confirmation ramène sur l'app (localhost ou Vercel).
-        options: { emailRedirectTo: window.location.origin },
+        // Le lien de confirmation ramène sur l'app (localhost ou GitHub Pages, sous /radon_laveur/).
+        options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
       })
       if (error) setErreur(messageErreur(error))
       // Sans session, Supabase attend la confirmation de l'adresse e-mail.
