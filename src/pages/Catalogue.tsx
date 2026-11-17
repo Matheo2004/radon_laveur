@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import Confettis from '../components/Confettis'
 
 type Bon = {
   id: number
@@ -62,7 +63,8 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
       </p>
 
       {obtenu && (
-        <div className="carte succes">
+        <div className="carte succes" key={obtenu.code}>
+          <Confettis />
           <p>
             Bon obtenu : <strong>{obtenu.titre}</strong>
           </p>
@@ -97,7 +99,7 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
                 )}
               </p>
               {points === null ? (
-                <span className={`badge ${b.stock === 0 ? 'refusee' : 'en_attente'}`}>{b.stock === 0 ? 'Épuisé' : `${b.cout_points} pts`}</span>
+                <span className={`badge ${b.stock === 0 ? 'refusee' : 'validee'}`}>{b.stock === 0 ? 'Épuisé' : `${b.stock} disponibles`}</span>
               ) : manque <= 0 && b.stock > 0 ? (
                 <button type="button" className="peser" onClick={() => echanger(b)} disabled={enCours !== null}>
                   {enCours === b.id ? 'Échange…' : `Échanger ${b.cout_points} pts`}

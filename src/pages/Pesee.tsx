@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { Html5Qrcode } from 'html5-qrcode'
+import Confettis from '../components/Confettis'
 
 type Props = {
   client: SupabaseClient
@@ -68,6 +69,7 @@ export default function Pesee({ client, declarationId, onTermine }: Props) {
   if (points !== null) {
     return (
       <section className="carte succes">
+        <Confettis />
         <h2>Pesée validée !</h2>
         <p className="points">
           <strong>+{points}</strong> pts

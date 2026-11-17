@@ -11,6 +11,7 @@ export type Extremum = { type: 'basse' | 'haute'; heure: Date; hauteur: number }
 export type Creneau = { debut: Date; fin: Date; basse: Date; deJour: boolean }
 export type Etat = {
   hauteur: number
+  niveau: number // 0 = plus basse mer des 3 jours, 1 = plus haute (pour la jauge)
   tendance: 'montante' | 'descendante'
   prochaine: Extremum | null
   creneauActuel: Creneau | null
@@ -67,8 +68,13 @@ export function analyser(heures: string[], hauteurs: (number | null)[], maintena
     })
     .filter((c) => c.fin.getTime() > n)
 
+  const bas = Math.min(...y)
+  const haut = Math.max(...y)
+  const niveau = haut > bas ? (hauteur - bas) / (haut - bas) : 0.5
+
   return {
     hauteur,
+    niveau,
     tendance,
     prochaine: extrema.find((e) => e.heure.getTime() > n) ?? null,
     creneauActuel: creneaux.find((c) => c.debut.getTime() <= n && n <= c.fin.getTime()) ?? null,

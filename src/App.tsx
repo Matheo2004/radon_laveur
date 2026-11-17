@@ -11,6 +11,8 @@ import Catalogue from './pages/Catalogue'
 import MesBons from './pages/MesBons'
 import Sorties from './pages/Sorties'
 import CreerSortie from './pages/CreerSortie'
+import Vagues from './components/Vagues'
+import BarreNavigation from './components/BarreNavigation'
 // Le lecteur de QR code est lourd : il n'est chargé qu'au moment de la pesée.
 const Pesee = lazy(() => import('./pages/Pesee'))
 
@@ -137,11 +139,20 @@ export default function App() {
     )
   }
 
+  // La barre du bas n'apparaît que sur les pages principales (pas pendant une déclaration, une pesée ou l'édition du profil).
+  const navigationVisible = Boolean(session && profil && !edition && !declarer && pesee === null && page !== 'creer-sortie')
+  // Clé de l'écran affiché : quand elle change, l'écran rejoue son animation d'entrée.
+  const ecran = !session ? (vitrine ? 'vitrine' : 'connexion') : edition || !profil ? 'profil' : pesee !== null ? 'pesee' : declarer ? 'declarer' : page
+
   return (
-    <main>
-      <h1>Radon Laveur</h1>
-      <p className="slogan">Ramassons main dans la main</p>
-      {contenu()}
-    </main>
+    <>
+      <Vagues compact={Boolean(session && profil)} />
+      <main className={navigationVisible ? 'avec-navigation' : ''}>
+        <div key={ecran} className="ecran">
+          {contenu()}
+        </div>
+      </main>
+      {navigationVisible && <BarreNavigation page={page} onPage={setPage} />}
+    </>
   )
 }
