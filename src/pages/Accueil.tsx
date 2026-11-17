@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Profil } from '../types'
 import type { Page } from '../App'
 import MesDeclarations from './MesDeclarations'
+import Maree from './Maree'
 
 type Props = {
   client: SupabaseClient
@@ -52,6 +53,8 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
           🎟️ Mes bons
         </button>
       </nav>
+
+      <Maree />
 
       <h2>Mes ramassages</h2>
       <MesDeclarations client={client} userId={profil.id} onPeser={onPeser} />
