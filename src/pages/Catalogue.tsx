@@ -12,13 +12,28 @@ type Bon = {
   stock: number
 }
 
-type Props = { client: SupabaseClient; points: number; onRetour: () => void }
+type Props = { client: SupabaseClient; points: number; onEchange: () => void; onRetour: () => void }
 
 // US12 : catalogue des bons d'achat et des commerces partenaires (financés par la ville).
-// L'échange des points contre un bon arrive avec US13 : ici, l'étudiant voit ce qu'il peut gagner.
-export default function Catalogue({ client, points, onRetour }: Props) {
+// US13 : le bouton « Échanger » appelle echanger_bon, qui débite les points côté serveur et renvoie un code unique.
+export default function Catalogue({ client, points, onEchange, onRetour }: Props) {
   const [bons, setBons] = useState<Bon[] | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
+  const [enCours, setEnCours] = useState<number | null>(null)
+  const [obtenu, setObtenu] = useState<{ titre: string; code: string } | null>(null)
+  const [version, setVersion] = useState(0) // relance le chargement après un échange (stock à jour)
+
+  async function echanger(bon: Bon) {
+    if (!window.confirm(`Échanger ${bon.cout_points} pts contre « ${bon.titre} » ?`)) return
+    setErreur(null)
+    setEnCours(bon.id)
+    const { data, error } = await client.rpc('echanger_bon', { p_bon: bon.id })
+    setEnCours(null)
+    if (error) return setErreur(error.message)
+    setObtenu({ titre: bon.titre, code: data as string })
+    setVersion((v) => v + 1)
+    onEchange() // recharge le profil : les points ont été débités par la base
+  }
 
   useEffect(() => {
     client
@@ -29,7 +44,7 @@ export default function Catalogue({ client, points, onRetour }: Props) {
         if (error) setErreur(error.message)
         else setBons((data ?? []) as Bon[])
       })
-  }, [client])
+  }, [client, version])
 
   return (
     <section className="carte">
@@ -38,7 +53,16 @@ export default function Catalogue({ client, points, onRetour }: Props) {
         Tu as <strong>{points} pts</strong>. 10 kg de déchets ramassés = 100 pts.
       </p>
 
-      {erreur && <p className="erreur">Impossible de charger le catalogue : {erreur}</p>}
+      {obtenu && (
+        <div className="carte succes">
+          <p>
+            Bon obtenu : <strong>{obtenu.titre}</strong>
+          </p>
+          <p className="code-bon">{obtenu.code}</p>
+          <p className="aide">Présente ce code au partenaire. Tu le retrouves dans « Mes bons ».</p>
+        </div>
+      )}
+      {erreur && <p className="erreur" role="alert">{erreur}</p>}
       {bons === null && !erreur && <p className="aide">Chargement…</p>}
       {bons?.length === 0 && <p className="aide">Pas encore de bons disponibles.</p>}
 
@@ -64,9 +88,15 @@ export default function Catalogue({ client, points, onRetour }: Props) {
                   </>
                 )}
               </p>
-              <span className={`badge ${b.stock === 0 ? 'refusee' : manque <= 0 ? 'validee' : 'en_attente'}`}>
-                {b.stock === 0 ? 'Épuisé' : manque <= 0 ? 'Tu peux l’obtenir !' : `Encore ${manque} pts`}
-              </span>
+              {manque <= 0 && b.stock > 0 ? (
+                <button type="button" className="peser" onClick={() => echanger(b)} disabled={enCours !== null}>
+                  {enCours === b.id ? 'Échange…' : `Échanger ${b.cout_points} pts`}
+                </button>
+              ) : (
+                <span className={`badge ${b.stock === 0 ? 'refusee' : 'en_attente'}`}>
+                  {b.stock === 0 ? 'Épuisé' : `Encore ${manque} pts`}
+                </span>
+              )}
             </li>
           )
         })}
