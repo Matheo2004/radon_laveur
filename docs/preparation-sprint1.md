@@ -2,7 +2,7 @@
 
 Objectif du sprint 1 : « l'application est en ligne et un étudiant crée son compte ». Avant de commencer, l'environnement doit être prêt pour que les 2 h du sprint servent à coder.
 
-**Prêt quand** : le dépôt existe avec la CI verte, l'URL Vercel affiche les 23 zones, chacun lance l'app en local, et le backlog est dans GitHub Projects.
+**Prêt quand** : le dépôt existe avec la CI verte, l'URL en ligne (GitHub Pages) affiche l'application, chacun lance l'app en local, et le backlog est dans GitHub Projects.
 
 Ordre conseillé : Mathéo d'abord (étapes 1 à 4), puis tout le monde en parallèle.
 
@@ -18,7 +18,7 @@ Ordre conseillé : Mathéo d'abord (étapes 1 à 4), puis tout le monde en paral
    Inviter Boris, Océane, Pauline et Nathan (Settings › Collaborators).
 2. **Protéger `main`** : Settings › Branches › Add rule : pull request obligatoire, 1 relecture, statut « CI / build » obligatoire.
 3. **Supabase** : créer un projet (région Europe), puis dans SQL Editor exécuter `supabase/schema.sql`, puis `supabase/seed_zones.sql`. Dans Storage, créer un bucket `photos` (servira au sprint 2). Récupérer l'URL et la clé `anon` dans Project Settings › API.
-4. **Vercel** : Add New › Project › importer le dépôt (framework détecté : Vite). Ajouter les variables `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY`, déployer, vérifier que la page liste les 23 zones.
+4. **GitHub Pages** (remplace Vercel, décision du sprint 1) : Settings › Pages › Source « GitHub Actions ». Dans Settings › Secrets and variables › Actions › Variables, créer `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY`. Le workflow `deploy.yml` publie l'app sur https://matheo2004.github.io/radon_laveur/ à chaque fusion sur `main`. Dans Supabase › Authentication › URL Configuration, ajouter cette URL (Site URL et Redirect URLs).
 5. Transmettre l'URL et la clé `anon` à l'équipe en séance (pas dans Git, pas dans le chat de groupe public).
 
 ## Pauline (Scrum Master)
