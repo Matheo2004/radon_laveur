@@ -709,3 +709,101 @@ textarea { resize: vertical; }
 @keyframes danse { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-15deg) translateX(-4px); } 40% { transform: rotate(15deg) translateX(4px); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(10deg); } }
 @keyframes rayures { from { background-position: 0 0; } to { background-position: 28px 0; } }
 @keyframes brille { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.12) rotate(-6deg); } }
+
+/* ==========================================================================
+   Encore plus loin : ciel selon l'heure, bouton son, mini-jeu, pluie de fête
+   ========================================================================== */
+
+/* Ciel qui change avec l'heure */
+.entete.ciel-aube { background: linear-gradient(135deg, #3c5a8a 0%, #e79a7b 60%, #f6c453 100%); }
+.entete.ciel-jour { background: linear-gradient(135deg, var(--bleu-fonce) 0%, var(--bleu) 55%, #1d7aa3 100%); }
+.entete.ciel-crepuscule { background: linear-gradient(135deg, #2b2f6b 0%, #b5487a 55%, var(--orange) 100%); }
+.entete.ciel-nuit { background: linear-gradient(135deg, #050d24 0%, #0d2147 60%, #133a5e 100%); }
+.astre { position: absolute; top: 10px; right: 16px; font-size: 28px; z-index: 1; animation: flotte 6s ease-in-out infinite; filter: drop-shadow(0 0 12px rgba(255, 230, 150, 0.6)); }
+.entete.compact .astre { font-size: 20px; top: 8px; right: 64px; }
+.etoiles { position: absolute; inset: 0; pointer-events: none; }
+.etoiles span { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px #fff; animation: scintille 2.4s ease-in-out infinite; }
+.entete-titre { flex: 1; min-width: 0; }
+.bouton-son {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 20px;
+  backdrop-filter: blur(6px);
+}
+
+/* Mini-jeu */
+.jeu-raccourci { background: linear-gradient(120deg, #fff 0%, #f3ecff 100%); }
+.jeu-scores { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 8px 0; font-size: 0.95rem; }
+.jeu-terrain {
+  position: relative;
+  height: 380px;
+  border-radius: 18px;
+  overflow: hidden;
+  touch-action: none; /* le doigt déplace le raton au lieu de faire défiler la page */
+  user-select: none;
+  background: linear-gradient(180deg, #bfe6f7 0%, #e9f7fc 55%, #f3e2c4 82%, #ecd3a6 100%);
+  box-shadow: inset 0 0 0 2px rgba(11, 79, 108, 0.12);
+}
+.jeu-terrain::after {
+  /* petites vagues au niveau de la plage */
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 74%;
+  height: 14px;
+  background: radial-gradient(circle at 10px -4px, transparent 12px, rgba(255, 255, 255, 0.8) 13px) repeat-x;
+  background-size: 24px 14px;
+  animation: houle 6s linear infinite;
+  width: 200%;
+}
+.jeu-objet { position: absolute; transform: translate(-50%, -50%); font-size: 30px; pointer-events: none; animation: tangue 1.2s ease-in-out infinite; }
+.jeu-raton {
+  position: absolute;
+  bottom: 4%;
+  transform: translateX(-50%);
+  font-size: 42px;
+  line-height: 1;
+  pointer-events: none;
+  transition: left 0.06s linear;
+  z-index: 2;
+}
+.jeu-poubelle { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); font-size: 30px; }
+.jeu-message { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 90%; margin: 0; padding: 6px 10px; background: rgba(255, 255, 255, 0.92); border-radius: 12px; text-align: center; font-size: 0.85rem; font-weight: 600; animation: pop 0.3s var(--ressort); z-index: 3; }
+.jeu-voile { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px; background: rgba(7, 58, 80, 0.55); color: #fff; text-align: center; backdrop-filter: blur(3px); z-index: 4; }
+.jeu-voile p { margin: 0; font-weight: 600; }
+.jeu-voile button { max-width: 240px; }
+.jeu-final { font-size: 1.6rem; animation: rebond 0.7s var(--ressort); }
+.jeu-commandes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+.jeu-commandes button { font-size: 22px; }
+
+/* Pluie de fête après une déclaration */
+.pluie-fete { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+.pluie span { position: absolute; top: -40px; animation: chute 2.6s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
+.pluie-texte {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90%, 420px);
+  margin: 0;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--ombre-forte);
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--bleu-fonce);
+  animation: rebond 0.6s var(--ressort), disparait 0.5s ease 3.7s forwards;
+}
+
+@keyframes scintille { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.3); } }
+@keyframes tangue { 0%, 100% { rotate: -12deg; } 50% { rotate: 12deg; } }
+@keyframes chute { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(110vh) rotate(540deg); opacity: 0.8; } }
+@keyframes disparait { to { opacity: 0; transform: translate(-50%, -60%); } }

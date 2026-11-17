@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { Html5Qrcode } from 'html5-qrcode'
 import Confettis from '../components/Confettis'
+import { jouer } from '../fun/sons'
 
 type Props = {
   client: SupabaseClient
@@ -63,6 +64,7 @@ export default function Pesee({ client, declarationId, onTermine }: Props) {
     })
     setEnvoi(false)
     if (error) return setErreur(error.message)
+    jouer('fanfare')
     setPoints(data as number)
   }
 

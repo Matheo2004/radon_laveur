@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { jouer } from '../fun/sons'
 import { BLAGUES, SALUTATIONS_NUIT } from '../fun/blagues'
 
 const FIGURES = ['saute', 'tourne', 'danse', 'secoue']
@@ -10,10 +11,31 @@ export default function Mascotte({ pseudo }: { pseudo: string }) {
   const [phrase, setPhrase] = useState(nuit ? SALUTATIONS_NUIT[0] : `Salut ${pseudo} ! Touche-moi pour une blague.`)
   const [figure, setFigure] = useState('')
   const [compteur, setCompteur] = useState(0)
+  const [regard, setRegard] = useState({ x: 0, y: 0 })
+  const bouton = useRef<HTMLButtonElement>(null)
+
+  // Ses yeux suivent ton doigt ou ta souris, où que tu sois sur la page.
+  useEffect(() => {
+    function suivre(e: PointerEvent) {
+      const zone = bouton.current?.getBoundingClientRect()
+      if (!zone) return
+      const dx = e.clientX - (zone.left + zone.width / 2)
+      const dy = e.clientY - (zone.top + zone.height / 2)
+      const distance = Math.hypot(dx, dy) || 1
+      setRegard({ x: (dx / distance) * 2.2, y: (dy / distance) * 2.2 })
+    }
+    window.addEventListener('pointermove', suivre)
+    window.addEventListener('pointerdown', suivre)
+    return () => {
+      window.removeEventListener('pointermove', suivre)
+      window.removeEventListener('pointerdown', suivre)
+    }
+  }, [])
 
   function chatouiller() {
     const n = compteur + 1
     setCompteur(n)
+    jouer(n === 10 ? 'fanfare' : 'pouet')
     setFigure('')
     // On attend une image pour relancer l'animation, même si c'est la même figure.
     window.requestAnimationFrame(() => setFigure(FIGURES[n % FIGURES.length]))
@@ -24,6 +46,7 @@ export default function Mascotte({ pseudo }: { pseudo: string }) {
     <div className="mascotte">
       <button
         type="button"
+        ref={bouton}
         className={`mascotte-raton ${figure} ${nuit ? 'dort' : ''}`}
         onClick={chatouiller}
         aria-label="Chatouiller le raton laveur"
@@ -38,8 +61,10 @@ export default function Mascotte({ pseudo }: { pseudo: string }) {
           <g className="yeux">
             <circle cx="29" cy="42" r="4" fill="#fff" />
             <circle cx="51" cy="42" r="4" fill="#fff" />
-            <circle cx="30" cy="42" r="2" fill="#1d2025" />
-            <circle cx="52" cy="42" r="2" fill="#1d2025" />
+            <g style={{ transform: `translate(${regard.x}px, ${regard.y}px)`, transition: 'transform 0.08s' }}>
+              <circle cx="30" cy="42" r="2" fill="#1d2025" />
+              <circle cx="52" cy="42" r="2" fill="#1d2025" />
+            </g>
           </g>
           <ellipse cx="40" cy="56" rx="12" ry="8" fill="#e3e6ea" />
           <ellipse cx="40" cy="53" rx="4" ry="3" fill="#1d2025" />

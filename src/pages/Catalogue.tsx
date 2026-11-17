@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Confettis from '../components/Confettis'
+import { jouer } from '../fun/sons'
 import Chargement from '../components/Chargement'
 import { useDelaiMinimum } from '../useDelaiMinimum'
 
@@ -35,6 +36,7 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
     const { data, error } = await client.rpc('echanger_bon', { p_bon: bon.id })
     setEnCours(null)
     if (error) return setErreur(error.message)
+    jouer('fanfare')
     setObtenu({ titre: bon.titre, code: data as string })
     setVersion((v) => v + 1)
     onEchange?.() // recharge le profil : les points ont été débités par la base
