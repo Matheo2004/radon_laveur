@@ -11,6 +11,8 @@ const TAILLE = 50 // nombre de bénévoles affichés
 type Props = { client: SupabaseClient; moi: Profil; onRetour: () => void }
 
 const rangTexte = (rang: number) => (rang === 1 ? '1er' : `${rang}e`)
+const MEDAILLES = ['🥇', '🥈', '🥉']
+const rangAffiche = (i: number) => MEDAILLES[i] ?? String(i + 1)
 
 // US09 : trois classements distincts : bénévoles (comme sur Strava), associations et écoles.
 // Seuls le pseudo, l'école, l'association et les points sont publics : aucun e-mail ni nom réel.
@@ -70,8 +72,8 @@ export default function Classement({ client, moi, onRetour }: Props) {
     return (
       <ol className="classement">
         {groupes.map((g, i) => (
-          <li key={g.cle} className={g.cle === maCle ? 'moi' : ''}>
-            <span className="rang">{i + 1}</span>
+          <li key={g.cle} className={g.cle === maCle ? 'moi' : ''} style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}>
+            <span className="rang">{rangAffiche(i)}</span>
             <span className="qui">
               <strong>{g.nom}</strong>
               <small>
@@ -124,8 +126,8 @@ export default function Classement({ client, moi, onRetour }: Props) {
           ) : (
             <ol className="classement">
               {benevoles.map((b, i) => (
-                <li key={b.id} className={b.id === moi.id ? 'moi' : ''}>
-                  <span className="rang">{i + 1}</span>
+                <li key={b.id} className={b.id === moi.id ? 'moi' : ''} style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}>
+                  <span className="rang">{rangAffiche(i)}</span>
                   <span className="qui">
                     <strong>{b.pseudo}</strong>
                     <small>{b.ecole}</small>

@@ -16,12 +16,23 @@ export default function Maree() {
   if (erreur) return <p className="aide">Marées : {erreur}</p>
   if (!etat) return <p className="aide">Chargement des marées…</p>
 
-  const { creneauActuel, prochaine, tendance, creneaux } = etat
+  const { creneauActuel, prochaine, tendance, creneaux, niveau } = etat
   const prochainCreneau = creneaux.find((c) => c !== creneauActuel)
 
   return (
     <section className="carte maree">
-      <h2>🌊 Marées en rade de Brest</h2>
+      <div className="maree-tete">
+        <h2>🌊 Marées en rade de Brest</h2>
+        {/* Jauge animée : la hauteur d'eau actuelle entre la plus basse et la plus haute mer prévues */}
+        <div className="jauge" role="img" aria-label={`Niveau de la mer : ${Math.round(niveau * 100)} %, mer ${tendance}`}>
+          <div className="jauge-eau" style={{ height: `${Math.round(12 + niveau * 76)}%` }}>
+            <svg viewBox="0 0 120 20" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0,10 C20,0 40,20 60,10 C80,0 100,20 120,10 L120,20 L0,20 Z" />
+            </svg>
+          </div>
+          <span className="jauge-fleche" aria-hidden="true">{tendance === 'montante' ? '▲' : '▼'}</span>
+        </div>
+      </div>
 
       {creneauActuel ? (
         <p className="maree-etat bon">

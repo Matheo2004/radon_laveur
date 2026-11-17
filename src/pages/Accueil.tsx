@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useCompteur } from '../useCompteur'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Profil } from '../types'
 import type { Page } from '../App'
@@ -15,7 +16,14 @@ type Props = {
   onRafraichir: () => void
 }
 
+const salutation = () => {
+  const h = new Date().getHours()
+  return h < 6 ? 'Bonne nuit' : h < 12 ? 'Bonjour' : h < 18 ? 'Bel après-midi' : 'Bonsoir'
+}
+
 export default function Accueil({ client, profil, onModifier, onDeclarer, onPeser, onPage, onRafraichir }: Props) {
+  const pointsAffiches = useCompteur(profil.points)
+  const kg = (profil.points / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 })
   // Recharge le profil à chaque retour sur l'accueil : les points ont pu être crédités entre-temps.
   useEffect(() => {
     onRafraichir()
@@ -25,14 +33,17 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
     <>
       <section className="carte profil">
         <div>
+          <p className="salut">{salutation()},</p>
           <p className="pseudo">{profil.pseudo}</p>
           <p className="aide">{profil.ecole}</p>
         </div>
-        <p className="points">
-          <strong>{profil.points}</strong> pts
-        </p>
+        <div className="compteur" key={profil.points}>
+          <strong>{pointsAffiches}</strong>
+          <span>pts</span>
+          <small>≈ {kg} kg ramassés</small>
+        </div>
         <button type="button" className="declarer" onClick={onDeclarer}>
-          Déclarer un ramassage
+          <span aria-hidden="true">📸</span> Déclarer un ramassage
         </button>
         <button type="button" className="secondaire" onClick={onModifier}>
           Modifier mon profil
@@ -42,22 +53,17 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
         </button>
       </section>
 
-      <nav className="navigation">
-        <button type="button" className="secondaire" onClick={() => onPage('sorties')}>
-          📅 Sorties
-        </button>
-        <button type="button" className="secondaire" onClick={() => onPage('classement')}>
-          🏆 Classement
-        </button>
-        <button type="button" className="secondaire" onClick={() => onPage('catalogue')}>
-          🎁 Bons d'achat
-        </button>
-        <button type="button" className="secondaire" onClick={() => onPage('bons')}>
-          🎟️ Mes bons
-        </button>
-      </nav>
 
       <Maree />
+
+      <button type="button" className="carte raccourci" onClick={() => onPage('sorties')}>
+        <span className="raccourci-icone" aria-hidden="true">📅</span>
+        <span>
+          <strong>Ramasser en groupe</strong>
+          <small>Rejoins une sortie organisée par une école ou une association</small>
+        </span>
+        <span aria-hidden="true">›</span>
+      </button>
 
       <h2>Mes ramassages</h2>
       <MesDeclarations client={client} userId={profil.id} onPeser={onPeser} />
