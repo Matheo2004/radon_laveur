@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Profil } from '../types'
+import Chargement from '../components/Chargement'
 
 export type Sortie = {
   id: number
@@ -107,7 +108,7 @@ export default function Sorties({ client, moi, onCreer, onRetour }: Props) {
       )}
 
       {erreur && <p className="erreur" role="alert">{erreur}</p>}
-      {sorties === null && !erreur && <p className="aide">Chargement…</p>}
+      {sorties === null && !erreur && <Chargement texte="Le raton laveur prépare les sorties…" />}
       {sorties?.length === 0 && <p className="aide">Aucune sortie prévue pour l'instant. Lance la première !</p>}
 
       <ul className="sorties">

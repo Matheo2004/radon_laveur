@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Profil } from '../types'
+import Chargement from '../components/Chargement'
 
 type Benevole = { id: string; pseudo: string; ecole: string | null; points: number }
 type Groupe = { cle: string; nom: string; membres: number; points: number }
@@ -67,7 +68,7 @@ export default function Classement({ client, moi, onRetour }: Props) {
   const jeSuisDansLaListe = benevoles?.some((b) => b.id === moi.id)
 
   function listeGroupes(groupes: Groupe[] | null, maCle: string | null, vide: string) {
-    if (groupes === null) return <p className="aide">Chargement…</p>
+    if (groupes === null) return <Chargement texte="Le raton laveur compte les points…" />
     if (groupes.length === 0) return <p className="aide">{vide}</p>
     return (
       <ol className="classement">
@@ -122,7 +123,7 @@ export default function Classement({ client, moi, onRetour }: Props) {
             </p>
           )}
           {benevoles === null ? (
-            <p className="aide">Chargement…</p>
+            <Chargement texte="Le raton laveur compte les points…" />
           ) : (
             <ol className="classement">
               {benevoles.map((b, i) => (

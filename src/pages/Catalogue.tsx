@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Confettis from '../components/Confettis'
+import Chargement from '../components/Chargement'
 
 type Bon = {
   id: number
@@ -73,7 +74,7 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
         </div>
       )}
       {erreur && <p className="erreur" role="alert">{erreur}</p>}
-      {bons === null && !erreur && <p className="aide">Chargement…</p>}
+      {bons === null && !erreur && <Chargement texte="Le raton laveur dépoussière les bons…" />}
       {bons?.length === 0 && <p className="aide">Pas encore de bons disponibles.</p>}
 
       <ul className="catalogue">

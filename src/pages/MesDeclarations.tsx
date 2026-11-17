@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { cheminPhoto, liensTemporaires } from '../photo'
+import Chargement from '../components/Chargement'
 
 type Declaration = {
   id: number
@@ -41,7 +42,7 @@ export default function MesDeclarations({ client, userId, onPeser }: Props) {
   }, [client, userId])
 
   if (erreur) return <p className="erreur">Impossible de charger tes déclarations : {erreur}</p>
-  if (declarations === null) return <p className="aide">Chargement de tes déclarations…</p>
+  if (declarations === null) return <Chargement texte="Le raton laveur trie tes ramassages…" />
   if (declarations.length === 0) return <p className="aide">Pas encore de ramassage déclaré : à toi de jouer !</p>
 
   return (
