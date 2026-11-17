@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import type { AuthError, SupabaseClient } from '@supabase/supabase-js'
+import MentionInformation, { VERSION_MENTION } from './MentionInformation'
 
 type Mode = 'connexion' | 'inscription'
 
@@ -32,6 +33,7 @@ export default function Connexion({ client }: { client: SupabaseClient }) {
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
+  const [accepte, setAccepte] = useState(false)
 
   function changerMode(nouveau: Mode) {
     setMode(nouveau)
@@ -43,6 +45,7 @@ export default function Connexion({ client }: { client: SupabaseClient }) {
     e.preventDefault()
     setErreur(null)
     setInfo(null)
+    if (mode === 'inscription' && !accepte) return setErreur("Lis et accepte la mention d'information pour créer ton compte.")
     setEnvoi(true)
 
     if (mode === 'connexion') {
@@ -54,7 +57,11 @@ export default function Connexion({ client }: { client: SupabaseClient }) {
         email,
         password: motDePasse,
         // Le lien de confirmation ramène sur l'app (localhost ou GitHub Pages, sous /radon_laveur/).
-        options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
+        options: {
+          emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
+          // Trace de l'information RGPD : date et version de la mention acceptée, rangées avec le compte.
+          data: { mention_acceptee_le: new Date().toISOString(), mention_version: VERSION_MENTION },
+        },
       })
       if (error) setErreur(messageErreur(error))
       // Sans session, Supabase attend la confirmation de l'adresse e-mail.
@@ -112,7 +119,16 @@ export default function Connexion({ client }: { client: SupabaseClient }) {
             onChange={(e) => setMotDePasse(e.target.value)}
           />
         </label>
-        {mode === 'inscription' && <p className="aide">6 caractères minimum.</p>}
+        {mode === 'inscription' && (
+          <>
+            <p className="aide">6 caractères minimum.</p>
+            <MentionInformation />
+            <label className="case">
+              <input type="checkbox" checked={accepte} onChange={(e) => setAccepte(e.target.checked)} />
+              J'ai lu la mention d'information sur mes données.
+            </label>
+          </>
+        )}
 
         {erreur && <p className="erreur" role="alert">{erreur}</p>}
         {info && <p className="info" role="status">{info}</p>}
