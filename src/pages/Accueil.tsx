@@ -48,6 +48,9 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
         <button type="button" className="secondaire" onClick={() => onPage('catalogue')}>
           🎁 Bons d'achat
         </button>
+        <button type="button" className="secondaire" onClick={() => onPage('bons')}>
+          🎟️ Mes bons
+        </button>
       </nav>
 
       <h2>Mes ramassages</h2>
