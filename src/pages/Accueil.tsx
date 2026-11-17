@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Profil } from '../types'
+import type { Page } from '../App'
 import MesDeclarations from './MesDeclarations'
 
 type Props = {
@@ -9,10 +10,11 @@ type Props = {
   onModifier: () => void
   onDeclarer: () => void
   onPeser: (declarationId: number) => void
+  onPage: (page: Page) => void
   onRafraichir: () => void
 }
 
-export default function Accueil({ client, profil, onModifier, onDeclarer, onPeser, onRafraichir }: Props) {
+export default function Accueil({ client, profil, onModifier, onDeclarer, onPeser, onPage, onRafraichir }: Props) {
   // Recharge le profil à chaque retour sur l'accueil : les points ont pu être crédités entre-temps.
   useEffect(() => {
     onRafraichir()
@@ -38,6 +40,12 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
           Se déconnecter
         </button>
       </section>
+
+      <nav className="navigation">
+        <button type="button" className="secondaire" onClick={() => onPage('classement')}>
+          🏆 Classement
+        </button>
+      </nav>
 
       <h2>Mes ramassages</h2>
       <MesDeclarations client={client} userId={profil.id} onPeser={onPeser} />
