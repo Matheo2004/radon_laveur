@@ -807,3 +807,109 @@ textarea { resize: vertical; }
 @keyframes tangue { 0%, 100% { rotate: -12deg; } 50% { rotate: 12deg; } }
 @keyframes chute { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(110vh) rotate(540deg); opacity: 0.8; } }
 @keyframes disparait { to { opacity: 0; transform: translate(-50%, -60%); } }
+
+/* ==========================================================================
+   Boutique du raton : bons présentés comme des tickets à détacher
+   ========================================================================== */
+.tirelire { display: flex; align-items: center; gap: 14px; padding: 12px 14px; margin-bottom: 12px; border-radius: 16px; background: linear-gradient(135deg, #fff1e4 0%, #ffe0c2 100%); }
+.tirelire p { margin: 0; }
+.tirelire-cochon { font-size: 40px; animation: flotte 3s ease-in-out infinite; }
+.tirelire-points { font-size: 1.9rem; font-weight: 800; color: var(--orange-fonce); line-height: 1.1; }
+.tirelire-points small { font-size: 0.9rem; color: var(--texte-doux); }
+
+.filtres { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; margin: 0 -4px 6px; scrollbar-width: none; }
+.filtres::-webkit-scrollbar { display: none; }
+.filtres button {
+  width: auto;
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--bordure);
+  background: #fff;
+  color: var(--bleu);
+  font-size: 14px;
+}
+.filtres button.actif { background: var(--bleu); border-color: var(--bleu); color: #fff; }
+
+.tickets { list-style: none; padding: 0; margin: 10px 0; display: flex; flex-direction: column; gap: 14px; }
+.ticket {
+  --couleur: var(--bleu);
+  position: relative;
+  display: flex;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--ombre);
+  animation: glisse 0.45s var(--doux) backwards;
+  transition: transform 0.25s var(--ressort), box-shadow 0.25s;
+  filter: drop-shadow(0 1px 0 rgba(7, 58, 80, 0.06));
+}
+.ticket:hover { transform: translateY(-3px) rotate(-0.4deg); box-shadow: var(--ombre-forte); }
+.ticket.accessible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--couleur) 30%, transparent), var(--ombre); }
+.ticket.epuise { filter: grayscale(0.9); opacity: 0.65; }
+.ticket-talon {
+  position: relative;
+  width: 92px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 6px;
+  border-radius: 16px 0 0 16px;
+  color: #fff;
+  background: linear-gradient(160deg, var(--couleur) 0%, color-mix(in srgb, var(--couleur) 70%, #000) 100%);
+}
+/* pointillés de découpe et encoches du ticket */
+.ticket-talon::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  right: -1px;
+  border-right: 2px dashed rgba(255, 255, 255, 0.9);
+}
+.ticket::before,
+.ticket::after {
+  content: '';
+  position: absolute;
+  left: 82px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--fond);
+  z-index: 1;
+}
+.ticket::before { top: -10px; }
+.ticket::after { bottom: -10px; }
+.ticket-emoji { font-size: 38px; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.2)); transition: transform 0.3s var(--ressort); }
+.ticket:hover .ticket-emoji { transform: scale(1.15) rotate(-8deg); }
+.ticket-cout { font-size: 1.35rem; font-weight: 800; line-height: 1; text-align: center; }
+.ticket-cout small { display: block; font-size: 0.7rem; opacity: 0.85; letter-spacing: 1px; text-transform: uppercase; }
+.ticket-corps { flex: 1; min-width: 0; padding: 12px 14px 14px 20px; display: flex; flex-direction: column; gap: 4px; }
+.ticket-corps p { margin: 0; }
+.ticket-categorie { font-size: 0.72rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--couleur); }
+.ticket-titre { font-size: 1.08rem; font-weight: 800; color: var(--texte); line-height: 1.25; }
+.ticket-description { font-size: 0.9rem; color: var(--texte-doux); }
+.ticket-rare { align-self: flex-start; font-size: 0.78rem; font-weight: 800; color: #b3261e; background: #fde7e4; padding: 2px 8px; border-radius: 999px; animation: brille 1.8s ease-in-out infinite; }
+.ticket-bouton { width: 100%; margin-top: 6px; background: linear-gradient(135deg, var(--couleur) 0%, color-mix(in srgb, var(--couleur) 75%, #000) 100%); }
+.ticket-progression { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.ticket-progression small { white-space: nowrap; color: var(--texte-doux); font-weight: 600; }
+.ticket-barre { flex: 1; height: 8px; border-radius: 999px; background: var(--ecume); overflow: hidden; }
+.ticket-barre div { height: 100%; border-radius: inherit; background: var(--couleur); animation: remplissage 1s var(--doux) backwards; }
+
+.ticket-gagne { position: relative; overflow: hidden; text-align: center; padding: 16px; margin: 10px 0 14px; border-radius: 18px; background: linear-gradient(135deg, #fff8e6 0%, #ffe8b8 100%); border: 2px dashed #f2b84b; animation: rebond 0.6s var(--ressort); }
+.ticket-gagne p { margin: 4px 0; }
+.ticket-gagne-emoji { font-size: 52px; animation: toupie 0.8s var(--ressort); }
+
+/* Mes bons : tickets validés, agrandissables pour la caisse */
+.ticket-zone { all: unset; display: flex; width: 100%; cursor: pointer; border-radius: 16px; }
+.ticket-zone:focus-visible { outline: 3px solid var(--bleu-clair); outline-offset: 2px; }
+.ticket-valide { font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; padding: 2px 6px; border: 2px solid rgba(255, 255, 255, 0.9); border-radius: 6px; transform: rotate(-10deg); }
+.ticket-obtenu .code-bon { font-size: 1.1rem; padding: 4px 10px; margin: 6px 0 2px; align-self: flex-start; }
+.code-barres { display: flex; align-items: stretch; height: 34px; gap: 0; margin: 2px 0 4px; }
+.code-barres span { background: var(--texte); flex-shrink: 0; }
+.ticket-obtenu.agrandi { transform: scale(1.03); box-shadow: var(--ombre-forte); z-index: 2; }
+.ticket-obtenu.agrandi .code-bon { font-size: 1.7rem; letter-spacing: 4px; }
+.ticket-obtenu.agrandi .code-barres { height: 56px; }
