@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { COLONNES_PROFIL, type Profil } from './types'
@@ -6,6 +6,8 @@ import Connexion from './pages/Connexion'
 import ProfilForm from './pages/ProfilForm'
 import Accueil from './pages/Accueil'
 import Declarer from './pages/Declarer'
+// Le lecteur de QR code est lourd : il n'est chargé qu'au moment de la pesée.
+const Pesee = lazy(() => import('./pages/Pesee'))
 
 // Choisit l'écran à afficher : connexion, création du profil ou accueil.
 // Convention : `undefined` = pas encore chargé, `null` = n'existe pas.
@@ -15,6 +17,7 @@ export default function App() {
   const [erreurProfil, setErreurProfil] = useState<string | null>(null)
   const [edition, setEdition] = useState(false)
   const [declarer, setDeclarer] = useState(false)
+  const [pesee, setPesee] = useState<number | null>(null)
 
   // Suit la session : appelé au démarrage, puis à chaque connexion ou déconnexion.
   useEffect(() => {
@@ -41,6 +44,7 @@ export default function App() {
   useEffect(() => {
     setEdition(false)
     setDeclarer(false)
+    setPesee(null)
     setErreurProfil(null)
     if (!userId) setProfil(undefined)
     else chargerProfil()
@@ -69,6 +73,13 @@ export default function App() {
         />
       )
     }
+    if (pesee !== null) {
+      return (
+        <Suspense fallback={<p className="aide">Ouverture du lecteur de QR code…</p>}>
+          <Pesee client={supabase} declarationId={pesee} onTermine={() => setPesee(null)} />
+        </Suspense>
+      )
+    }
     if (declarer) {
       return (
         <Declarer
@@ -85,6 +96,7 @@ export default function App() {
         profil={profil}
         onModifier={() => setEdition(true)}
         onDeclarer={() => setDeclarer(true)}
+        onPeser={(id) => setPesee(id)}
         onRafraichir={chargerProfil}
       />
     )
