@@ -43,6 +43,9 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
       </section>
 
       <nav className="navigation">
+        <button type="button" className="secondaire" onClick={() => onPage('sorties')}>
+          📅 Sorties
+        </button>
         <button type="button" className="secondaire" onClick={() => onPage('classement')}>
           🏆 Classement
         </button>
