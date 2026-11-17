@@ -2,20 +2,23 @@ import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Profil } from '../types'
 
-type Ligne = { id: string; pseudo: string; ecole: string | null; points: number }
-type Ecole = { ecole: string; etudiants: number; points: number }
-type Onglet = 'etudiants' | 'ecoles'
+type Benevole = { id: string; pseudo: string; ecole: string | null; points: number }
+type Groupe = { cle: string; nom: string; membres: number; points: number }
+type Onglet = 'benevoles' | 'associations' | 'ecoles'
 
 const TAILLE = 50 // nombre de bénévoles affichés
 
 type Props = { client: SupabaseClient; moi: Profil; onRetour: () => void }
 
-// US09 : classement des bénévoles (comme sur Strava) et classement par école.
-// Seuls le pseudo, l'école et les points sont publics : aucun e-mail ni nom réel.
+const rangTexte = (rang: number) => (rang === 1 ? '1er' : `${rang}e`)
+
+// US09 : trois classements distincts : bénévoles (comme sur Strava), associations et écoles.
+// Seuls le pseudo, l'école, l'association et les points sont publics : aucun e-mail ni nom réel.
 export default function Classement({ client, moi, onRetour }: Props) {
-  const [onglet, setOnglet] = useState<Onglet>('etudiants')
-  const [lignes, setLignes] = useState<Ligne[] | null>(null)
-  const [ecoles, setEcoles] = useState<Ecole[] | null>(null)
+  const [onglet, setOnglet] = useState<Onglet>('benevoles')
+  const [benevoles, setBenevoles] = useState<Benevole[] | null>(null)
+  const [associations, setAssociations] = useState<Groupe[] | null>(null)
+  const [ecoles, setEcoles] = useState<Groupe[] | null>(null)
   const [monRang, setMonRang] = useState<number | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
 
@@ -28,7 +31,7 @@ export default function Classement({ client, moi, onRetour }: Props) {
       .limit(TAILLE)
       .then(({ data, error }) => {
         if (error) setErreur(error.message)
-        else setLignes((data ?? []) as Ligne[])
+        else setBenevoles((data ?? []) as Benevole[])
       })
 
     // Mon rang = nombre de bénévoles qui ont strictement plus de points que moi, + 1.
@@ -39,85 +42,120 @@ export default function Classement({ client, moi, onRetour }: Props) {
       .then(({ count }) => setMonRang((count ?? 0) + 1))
 
     client
+      .from('classement_associations')
+      .select('id, nom, benevoles, points')
+      .order('points', { ascending: false })
+      .then(({ data }) =>
+        setAssociations(
+          (data ?? []).map((a) => ({ cle: String(a.id), nom: a.nom as string, membres: a.benevoles as number, points: a.points as number })),
+        ),
+      )
+
+    client
       .from('classement_ecoles')
       .select('ecole, etudiants, points')
       .order('points', { ascending: false })
-      .then(({ data, error }) => {
-        if (!error) setEcoles((data ?? []) as Ecole[])
-      })
+      .then(({ data }) =>
+        setEcoles(
+          (data ?? []).map((e) => ({ cle: e.ecole as string, nom: e.ecole as string, membres: e.etudiants as number, points: e.points as number })),
+        ),
+      )
   }, [client, moi.points])
 
-  const jeSuisDansLaListe = lignes?.some((l) => l.id === moi.id)
+  const jeSuisDansLaListe = benevoles?.some((b) => b.id === moi.id)
+
+  function listeGroupes(groupes: Groupe[] | null, maCle: string | null, vide: string) {
+    if (groupes === null) return <p className="aide">Chargement…</p>
+    if (groupes.length === 0) return <p className="aide">{vide}</p>
+    return (
+      <ol className="classement">
+        {groupes.map((g, i) => (
+          <li key={g.cle} className={g.cle === maCle ? 'moi' : ''}>
+            <span className="rang">{i + 1}</span>
+            <span className="qui">
+              <strong>{g.nom}</strong>
+              <small>
+                {g.membres} bénévole{g.membres > 1 ? 's' : ''}
+              </small>
+            </span>
+            <span className="score">{g.points} pts</span>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+
+  const onglets: { id: Onglet; libelle: string }[] = [
+    { id: 'benevoles', libelle: 'Bénévoles' },
+    { id: 'associations', libelle: 'Associations' },
+    { id: 'ecoles', libelle: 'Écoles' },
+  ]
 
   return (
     <section className="carte">
       <h2>Classement</h2>
-      {monRang !== null && (
-        <p className="info">
-          Tu es <strong>{monRang === 1 ? '1er' : `${monRang}e`}</strong> avec {moi.points} pts.
-        </p>
-      )}
 
       <div className="onglets" role="tablist">
-        <button type="button" role="tab" aria-selected={onglet === 'etudiants'} className={onglet === 'etudiants' ? 'actif' : ''} onClick={() => setOnglet('etudiants')}>
-          Bénévoles
-        </button>
-        <button type="button" role="tab" aria-selected={onglet === 'ecoles'} className={onglet === 'ecoles' ? 'actif' : ''} onClick={() => setOnglet('ecoles')}>
-          Écoles
-        </button>
+        {onglets.map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            role="tab"
+            aria-selected={onglet === o.id}
+            className={onglet === o.id ? 'actif' : ''}
+            onClick={() => setOnglet(o.id)}
+          >
+            {o.libelle}
+          </button>
+        ))}
       </div>
 
       {erreur && <p className="erreur">Impossible de charger le classement : {erreur}</p>}
 
-      {onglet === 'etudiants' &&
-        (lignes === null ? (
-          <p className="aide">Chargement…</p>
-        ) : (
-          <ol className="classement">
-            {lignes.map((l, i) => (
-              <li key={l.id} className={l.id === moi.id ? 'moi' : ''}>
-                <span className="rang">{i + 1}</span>
-                <span className="qui">
-                  <strong>{l.pseudo}</strong>
-                  <small>{l.ecole}</small>
-                </span>
-                <span className="score">{l.points} pts</span>
-              </li>
-            ))}
-            {!jeSuisDansLaListe && monRang !== null && (
-              <li className="moi">
-                <span className="rang">{monRang}</span>
-                <span className="qui">
-                  <strong>{moi.pseudo}</strong>
-                  <small>{moi.ecole}</small>
-                </span>
-                <span className="score">{moi.points} pts</span>
-              </li>
-            )}
-          </ol>
-        ))}
+      {onglet === 'benevoles' && (
+        <>
+          {monRang !== null && (
+            <p className="info">
+              Tu es <strong>{rangTexte(monRang)}</strong> avec {moi.points} pts.
+            </p>
+          )}
+          {benevoles === null ? (
+            <p className="aide">Chargement…</p>
+          ) : (
+            <ol className="classement">
+              {benevoles.map((b, i) => (
+                <li key={b.id} className={b.id === moi.id ? 'moi' : ''}>
+                  <span className="rang">{i + 1}</span>
+                  <span className="qui">
+                    <strong>{b.pseudo}</strong>
+                    <small>{b.ecole}</small>
+                  </span>
+                  <span className="score">{b.points} pts</span>
+                </li>
+              ))}
+              {!jeSuisDansLaListe && monRang !== null && (
+                <li className="moi">
+                  <span className="rang">{monRang}</span>
+                  <span className="qui">
+                    <strong>{moi.pseudo}</strong>
+                    <small>{moi.ecole}</small>
+                  </span>
+                  <span className="score">{moi.points} pts</span>
+                </li>
+              )}
+            </ol>
+          )}
+        </>
+      )}
 
-      {onglet === 'ecoles' &&
-        (ecoles === null ? (
-          <p className="aide">Chargement…</p>
-        ) : ecoles.length === 0 ? (
-          <p className="aide">Pas encore de points par école.</p>
-        ) : (
-          <ol className="classement">
-            {ecoles.map((e, i) => (
-              <li key={e.ecole} className={e.ecole === moi.ecole ? 'moi' : ''}>
-                <span className="rang">{i + 1}</span>
-                <span className="qui">
-                  <strong>{e.ecole}</strong>
-                  <small>
-                    {e.etudiants} bénévole{e.etudiants > 1 ? 's' : ''}
-                  </small>
-                </span>
-                <span className="score">{e.points} pts</span>
-              </li>
-            ))}
-          </ol>
-        ))}
+      {onglet === 'associations' &&
+        listeGroupes(
+          associations,
+          moi.association_id ? String(moi.association_id) : null,
+          'Pas encore d’association. Choisis la tienne dans ton profil.',
+        )}
+
+      {onglet === 'ecoles' && listeGroupes(ecoles, moi.ecole, 'Pas encore de points par école.')}
 
       <button type="button" className="secondaire" onClick={onRetour}>
         Retour à l'accueil
