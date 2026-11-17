@@ -35,6 +35,7 @@ export default function Sorties({ client, moi, onCreer, onRetour }: Props) {
   const [erreur, setErreur] = useState<string | null>(null)
   const [enCours, setEnCours] = useState<number | null>(null)
   const [version, setVersion] = useState(0)
+  const [estDirigeant, setEstDirigeant] = useState<boolean | null>(null)
 
   useEffect(() => {
     client
@@ -46,6 +47,12 @@ export default function Sorties({ client, moi, onCreer, onRetour }: Props) {
         if (error) setErreur(error.message)
         else setSorties((data ?? []) as Sortie[])
       })
+    client
+      .from('dirigeant')
+      .select('id', { count: 'exact', head: true })
+      .eq('profil_id', moi.id)
+      .eq('statut', 'valide')
+      .then(({ count }) => setEstDirigeant((count ?? 0) > 0))
     client
       .from('inscription')
       .select('sortie_id')
@@ -80,19 +87,23 @@ export default function Sorties({ client, moi, onCreer, onRetour }: Props) {
     setVersion((v) => v + 1)
   }
 
-  const peutOrganiser = Boolean(moi.association_id || moi.ecole)
 
   return (
     <section className="carte">
       <h2>Sorties de groupe</h2>
       <p className="aide">Une association ou une école réserve un créneau sur une zone : tout le monde peut la rejoindre.</p>
 
-      {peutOrganiser ? (
+      {estDirigeant ? (
         <button type="button" className="declarer" onClick={onCreer}>
           Réserver un créneau
         </button>
       ) : (
-        <p className="info">Pour organiser une sortie, indique ton école ou ton association dans ton profil.</p>
+        estDirigeant === false && (
+          <p className="info">
+            Seuls les dirigeants d'une école ou d'une association réservent des créneaux. Demande-le dans « Modifier mon profil », ou ajoute
+            ton école ou ton association si elle manque.
+          </p>
+        )
       )}
 
       {erreur && <p className="erreur" role="alert">{erreur}</p>}

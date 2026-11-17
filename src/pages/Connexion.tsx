@@ -26,7 +26,7 @@ function messageErreur(error: AuthError): string {
   }
 }
 
-export default function Connexion({ client }: { client: SupabaseClient }) {
+export default function Connexion({ client, onVoirRecompenses }: { client: SupabaseClient; onVoirRecompenses: () => void }) {
   const [mode, setMode] = useState<Mode>('connexion')
   const [email, setEmail] = useState('')
   const [motDePasse, setMotDePasse] = useState('')
@@ -137,6 +137,9 @@ export default function Connexion({ client }: { client: SupabaseClient }) {
           {envoi ? 'Patiente…' : mode === 'connexion' ? 'Se connecter' : 'Créer mon compte'}
         </button>
       </form>
+      <button type="button" className="lien" onClick={onVoirRecompenses}>
+        🎁 Voir les récompenses à gagner
+      </button>
     </section>
   )
 }
