@@ -147,3 +147,13 @@ label.case input { width: 22px; height: 22px; min-height: 0; flex-shrink: 0; }
 .creneaux li span { min-width: 92px; color: #4a6573; }
 .creneaux li.nuit { opacity: 0.6; }
 .source { font-size: 0.75rem; margin-top: 8px; }
+
+/* Sorties de groupe */
+textarea { font: inherit; font-size: 16px; padding: 8px 12px; border: 1px solid var(--bordure); border-radius: 8px; font-weight: 400; }
+.sorties { list-style: none; padding: 0; margin: 12px 0; display: flex; flex-direction: column; gap: 10px; }
+.sorties li { padding: 12px; border: 1px solid var(--bordure); border-radius: 12px; background: #fff; display: flex; flex-direction: column; gap: 4px; }
+.sorties li.inscrit { border-color: var(--vert); }
+.sorties p { margin: 0; }
+.sortie-quand { font-weight: 700; color: var(--bleu); text-transform: capitalize; }
+.choix-creneaux { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; margin-top: 4px; }
+.choix-creneaux button { min-height: 44px; font-size: 14px; }

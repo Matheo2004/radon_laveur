@@ -9,11 +9,13 @@ import Declarer from './pages/Declarer'
 import Classement from './pages/Classement'
 import Catalogue from './pages/Catalogue'
 import MesBons from './pages/MesBons'
+import Sorties from './pages/Sorties'
+import CreerSortie from './pages/CreerSortie'
 // Le lecteur de QR code est lourd : il n'est chargé qu'au moment de la pesée.
 const Pesee = lazy(() => import('./pages/Pesee'))
 
 // Pages accessibles depuis l'accueil.
-export type Page = 'accueil' | 'classement' | 'catalogue' | 'bons'
+export type Page = 'accueil' | 'classement' | 'catalogue' | 'bons' | 'sorties' | 'creer-sortie'
 
 // Choisit l'écran à afficher : connexion, création du profil ou accueil.
 // Convention : `undefined` = pas encore chargé, `null` = n'existe pas.
@@ -105,6 +107,12 @@ export default function App() {
       return (
         <Catalogue client={supabase} points={profil.points} onEchange={chargerProfil} onRetour={() => setPage('accueil')} />
       )
+    }
+    if (page === 'sorties') {
+      return <Sorties client={supabase} moi={profil} onCreer={() => setPage('creer-sortie')} onRetour={() => setPage('accueil')} />
+    }
+    if (page === 'creer-sortie') {
+      return <CreerSortie client={supabase} moi={profil} onTermine={() => setPage('sorties')} onAnnuler={() => setPage('sorties')} />
     }
     if (page === 'bons') {
       return <MesBons client={supabase} onRetour={() => setPage('accueil')} />
