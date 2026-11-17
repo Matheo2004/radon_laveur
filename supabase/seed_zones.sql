@@ -12,7 +12,7 @@ insert into public.zone (code, nom, commune, latitude, longitude, longueur_km, r
   ('Z07', 'Port du Moulin Blanc – plage aux Rats', 'Brest', 48.38284, -4.43652, 3.2, null),
   ('Z08', 'Rubian – plage des Sables Rouges', 'Le Relecq-Kerhuon', 48.39132, -4.3998, 4.3, null),
   ('Z09', 'Plage du Moulin Blanc', 'Guipavas', 48.39751, -4.42827, 1.0, 'Commune à vérifier (Brest ou Le Relecq-Kerhuon)'),
-  ('Z10', 'Maison Blanche – Kerdidrun (rive de lÉlorn)', 'Guipavas', 48.40692, -4.36759, 2.8, null),
+  ('Z10', 'Maison Blanche – Kerdidrun (rive de l''Élorn)', 'Guipavas', 48.40692, -4.36759, 2.8, null),
   ('Z11', 'Vervian – Kerbasquiou (rive de l''Élorn)', 'Guipavas', 48.41327, -4.34111, 2.8, null),
   ('Z12', 'Porz Meur – pointe du Caro', 'Plougastel-Daoulas', 48.33127, -4.44828, 3.0, null),
   ('Z13', 'Fort du Corbeau', 'Plougastel-Daoulas', 48.34903, -4.44467, 3.0, null),

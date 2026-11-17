@@ -10,7 +10,7 @@ update public.zone set nom = 'Port de commerce – Le Guelmeur', remarque = 'Zon
 update public.zone set nom = 'Port du Moulin Blanc – plage aux Rats', remarque = null where code = 'Z07';
 update public.zone set nom = 'Rubian – plage des Sables Rouges', remarque = null where code = 'Z08';
 update public.zone set nom = 'Plage du Moulin Blanc', remarque = 'Commune à vérifier (Brest ou Le Relecq-Kerhuon)' where code = 'Z09';
-update public.zone set nom = 'Maison Blanche – Kerdidrun (rive de lÉlorn)', remarque = null where code = 'Z10';
+update public.zone set nom = 'Maison Blanche – Kerdidrun (rive de l''Élorn)', remarque = null where code = 'Z10';
 update public.zone set nom = 'Vervian – Kerbasquiou (rive de l''Élorn)', remarque = null where code = 'Z11';
 update public.zone set nom = 'Porz Meur – pointe du Caro', remarque = null where code = 'Z12';
 update public.zone set nom = 'Fort du Corbeau', remarque = null where code = 'Z13';
