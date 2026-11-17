@@ -18,8 +18,9 @@ export default function CreerSortie({ client, moi, onTermine, onAnnuler }: Props
   const [zones, setZones] = useState<Zone[]>([])
   const [existantes, setExistantes] = useState<Sortie[]>([])
   const [creneaux, setCreneaux] = useState<Creneau[]>([])
-  const [associationNom, setAssociationNom] = useState<string | null>(null)
-  const [organisateur, setOrganisateur] = useState<'association' | 'ecole'>(moi.association_id ? 'association' : 'ecole')
+  // Organisations que je dirige (rôle validé) : seules celles-ci peuvent réserver un créneau.
+  const [roles, setRoles] = useState<{ cle: string; type: 'association' | 'ecole'; associationId: number | null; ecole: string | null; nom: string }[]>([])
+  const [organisateur, setOrganisateur] = useState('')
   const [zoneId, setZoneId] = useState('')
   const [debut, setDebut] = useState('')
   const [fin, setFin] = useState('')
@@ -36,19 +37,26 @@ export default function CreerSortie({ client, moi, onTermine, onAnnuler }: Props
       .select('*')
       .gte('fin', new Date().toISOString())
       .then(({ data }) => setExistantes((data ?? []) as Sortie[]))
-    if (moi.association_id) {
-      client
-        .from('association')
-        .select('nom')
-        .eq('id', moi.association_id)
-        .maybeSingle()
-        .then(({ data }) => setAssociationNom((data?.nom as string) ?? null))
-    }
+    client
+      .from('dirigeant')
+      .select('association_id, ecole, association(nom)')
+      .eq('profil_id', moi.id)
+      .eq('statut', 'valide')
+      .then(({ data }) => {
+        const liste = (data ?? []).map((d) => {
+          const assoc = d.association as unknown as { nom: string } | null
+          return d.ecole
+            ? { cle: `e:${d.ecole}`, type: 'ecole' as const, associationId: null, ecole: d.ecole as string, nom: d.ecole as string }
+            : { cle: `a:${d.association_id}`, type: 'association' as const, associationId: d.association_id as number, ecole: null, nom: assoc?.nom ?? 'Association' }
+        })
+        setRoles(liste)
+        if (liste[0]) setOrganisateur(liste[0].cle)
+      })
     // Les créneaux de marée basse de jour sont proposés en un clic.
     chargerMaree()
       .then((etat) => setCreneaux((etat?.creneaux ?? []).filter((c) => c.deJour && c.debut.getTime() > Date.now())))
       .catch(() => undefined)
-  }, [client, moi.association_id])
+  }, [client, moi.id])
 
   function choisirCreneau(c: Creneau) {
     setDebut(versChamp(c.debut))
@@ -65,6 +73,8 @@ export default function CreerSortie({ client, moi, onTermine, onAnnuler }: Props
 
   async function valider(e: FormEvent) {
     e.preventDefault()
+    const role = roles.find((r) => r.cle === organisateur)
+    if (!role) return setErreur("Tu dois être dirigeant d'une école ou d'une association pour réserver.")
     if (!zoneId) return setErreur('Choisis la zone.')
     if (!debut || !fin) return setErreur('Indique le début et la fin du créneau.')
     const d = new Date(debut)
@@ -78,9 +88,9 @@ export default function CreerSortie({ client, moi, onTermine, onAnnuler }: Props
     setEnvoi(true)
     const { error } = await client.from('sortie').insert({
       zone_id: Number(zoneId),
-      organisateur_type: organisateur,
-      association_id: organisateur === 'association' ? moi.association_id : null,
-      ecole: organisateur === 'ecole' ? moi.ecole : null,
+      organisateur_type: role.type,
+      association_id: role.associationId,
+      ecole: role.ecole,
       debut: d.toISOString(),
       fin: f.toISOString(),
       places: places ? Number(places) : null,
@@ -101,9 +111,12 @@ export default function CreerSortie({ client, moi, onTermine, onAnnuler }: Props
       <form onSubmit={valider}>
         <label>
           Organisée par
-          <select value={organisateur} onChange={(e) => setOrganisateur(e.target.value as 'association' | 'ecole')}>
-            {moi.association_id && <option value="association">{associationNom ?? 'Mon association'}</option>}
-            {moi.ecole && <option value="ecole">{moi.ecole}</option>}
+          <select value={organisateur} onChange={(e) => setOrganisateur(e.target.value)}>
+            {roles.map((r) => (
+              <option key={r.cle} value={r.cle}>
+                {r.nom} ({r.type === 'ecole' ? 'école' : 'association'})
+              </option>
+            ))}
           </select>
         </label>
 

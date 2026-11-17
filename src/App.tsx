@@ -27,6 +27,7 @@ export default function App() {
   const [declarer, setDeclarer] = useState(false)
   const [pesee, setPesee] = useState<number | null>(null)
   const [page, setPage] = useState<Page>('accueil')
+  const [vitrine, setVitrine] = useState(false) // catalogue visible sans être connecté
 
   // Suit la session : appelé au démarrage, puis à chaque connexion ou déconnexion.
   useEffect(() => {
@@ -65,7 +66,13 @@ export default function App() {
       return <p className="erreur">Supabase non configuré : copiez .env.example en .env.local et remplissez-le.</p>
     }
     if (session === undefined) return <p className="aide">Chargement…</p>
-    if (session === null) return <Connexion client={supabase} />
+    if (session === null) {
+      return vitrine ? (
+        <Catalogue client={supabase} points={null} onRetour={() => setVitrine(false)} />
+      ) : (
+        <Connexion client={supabase} onVoirRecompenses={() => setVitrine(true)} />
+      )
+    }
     if (erreurProfil) return <p className="erreur">Impossible de charger le profil : {erreurProfil}</p>
     if (profil === undefined) return <p className="aide">Chargement du profil…</p>
 

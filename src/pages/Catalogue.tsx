@@ -12,7 +12,8 @@ type Bon = {
   stock: number
 }
 
-type Props = { client: SupabaseClient; points: number; onEchange: () => void; onRetour: () => void }
+// points = null : visiteur non connecté, qui découvre les récompenses avant de s'inscrire.
+type Props = { client: SupabaseClient; points: number | null; onEchange?: () => void; onRetour: () => void }
 
 // US12 : catalogue des bons d'achat et des commerces partenaires (financés par la ville).
 // US13 : le bouton « Échanger » appelle echanger_bon, qui débite les points côté serveur et renvoie un code unique.
@@ -32,7 +33,7 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
     if (error) return setErreur(error.message)
     setObtenu({ titre: bon.titre, code: data as string })
     setVersion((v) => v + 1)
-    onEchange() // recharge le profil : les points ont été débités par la base
+    onEchange?.() // recharge le profil : les points ont été débités par la base
   }
 
   useEffect(() => {
@@ -50,7 +51,14 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
     <section className="carte">
       <h2>Bons d'achat</h2>
       <p className="aide">
-        Tu as <strong>{points} pts</strong>. 10 kg de déchets ramassés = 100 pts.
+        {points === null ? (
+          <>Ramasse des déchets sur le littoral, gagne des points et échange-les contre ces récompenses.</>
+        ) : (
+          <>
+            Tu as <strong>{points} pts</strong>.
+          </>
+        )}{' '}
+        10 kg de déchets ramassés = 100 pts.
       </p>
 
       {obtenu && (
@@ -68,7 +76,7 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
 
       <ul className="catalogue">
         {bons?.map((b) => {
-          const manque = b.cout_points - points
+          const manque = b.cout_points - (points ?? 0)
           return (
             <li key={b.id} className={manque <= 0 && b.stock > 0 ? 'accessible' : ''}>
               <div className="bon-entete">
@@ -88,7 +96,9 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
                   </>
                 )}
               </p>
-              {manque <= 0 && b.stock > 0 ? (
+              {points === null ? (
+                <span className={`badge ${b.stock === 0 ? 'refusee' : 'en_attente'}`}>{b.stock === 0 ? 'Épuisé' : `${b.cout_points} pts`}</span>
+              ) : manque <= 0 && b.stock > 0 ? (
                 <button type="button" className="peser" onClick={() => echanger(b)} disabled={enCours !== null}>
                   {enCours === b.id ? 'Échange…' : `Échanger ${b.cout_points} pts`}
                 </button>
@@ -103,7 +113,7 @@ export default function Catalogue({ client, points, onEchange, onRetour }: Props
       </ul>
 
       <button type="button" className="secondaire" onClick={onRetour}>
-        Retour à l'accueil
+        {points === null ? 'Créer mon compte ou me connecter' : "Retour à l'accueil"}
       </button>
     </section>
   )
