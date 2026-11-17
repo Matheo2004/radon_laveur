@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Profil } from '../types'
 import Chargement from '../components/Chargement'
+import { useDelaiMinimum } from '../useDelaiMinimum'
 
 type Benevole = { id: string; pseudo: string; ecole: string | null; points: number }
 type Groupe = { cle: string; nom: string; membres: number; points: number }
@@ -24,6 +25,7 @@ export default function Classement({ client, moi, onRetour }: Props) {
   const [ecoles, setEcoles] = useState<Groupe[] | null>(null)
   const [monRang, setMonRang] = useState<number | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
+  const delai = useDelaiMinimum()
 
   useEffect(() => {
     client
@@ -68,7 +70,7 @@ export default function Classement({ client, moi, onRetour }: Props) {
   const jeSuisDansLaListe = benevoles?.some((b) => b.id === moi.id)
 
   function listeGroupes(groupes: Groupe[] | null, maCle: string | null, vide: string) {
-    if (groupes === null) return <Chargement texte="Le raton laveur compte les points…" />
+    if (groupes === null || !delai) return <Chargement texte="Le raton laveur compte les points…" />
     if (groupes.length === 0) return <p className="aide">{vide}</p>
     return (
       <ol className="classement">
@@ -122,7 +124,7 @@ export default function Classement({ client, moi, onRetour }: Props) {
               Tu es <strong>{rangTexte(monRang)}</strong> avec {moi.points} pts.
             </p>
           )}
-          {benevoles === null ? (
+          {benevoles === null || !delai ? (
             <Chargement texte="Le raton laveur compte les points…" />
           ) : (
             <ol className="classement">

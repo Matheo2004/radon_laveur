@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Chargement from '../components/Chargement'
+import { useDelaiMinimum } from '../useDelaiMinimum'
 
 type Echange = {
   id: number
@@ -13,6 +14,7 @@ type Echange = {
 export default function MesBons({ client, onRetour }: { client: SupabaseClient; onRetour: () => void }) {
   const [echanges, setEchanges] = useState<Echange[] | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
+  const delai = useDelaiMinimum()
 
   useEffect(() => {
     client
@@ -29,10 +31,10 @@ export default function MesBons({ client, onRetour }: { client: SupabaseClient; 
     <section className="carte">
       <h2>Mes bons</h2>
       {erreur && <p className="erreur">Impossible de charger tes bons : {erreur}</p>}
-      {echanges === null && !erreur && <Chargement texte="Le raton laveur cherche tes bons…" />}
-      {echanges?.length === 0 && <p className="aide">Pas encore de bon : échange tes points dans « Bons d'achat ».</p>}
+      {(echanges === null || !delai) && !erreur && <Chargement texte="Le raton laveur cherche tes bons…" />}
+      {delai && echanges?.length === 0 && <p className="aide">Pas encore de bon : échange tes points dans « Bons d'achat ».</p>}
       <ul className="catalogue">
-        {echanges?.map((e) => (
+        {delai && echanges?.map((e) => (
           <li key={e.id}>
             <strong>{e.bon_achat?.titre}</strong>
             <p className="partenaire">

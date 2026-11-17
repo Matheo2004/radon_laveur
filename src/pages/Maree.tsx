@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { chargerMaree, heure, jour, type Etat } from '../maree'
 import Chargement from '../components/Chargement'
+import { useDelaiMinimum } from '../useDelaiMinimum'
 
 // Panneau « Marées » : quand ramasser ? Autour de la marée basse, l'estran découvert est plus grand
 // et on évite d'être surpris par la mer qui monte.
 export default function Maree() {
   const [etat, setEtat] = useState<Etat | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
+  const delai = useDelaiMinimum()
 
   useEffect(() => {
     chargerMaree()
@@ -15,7 +17,7 @@ export default function Maree() {
   }, [])
 
   if (erreur) return <p className="aide">Marées : {erreur}</p>
-  if (!etat) return <Chargement texte="Le raton laveur guette la marée…" />
+  if (!etat || !delai) return <Chargement texte="Le raton laveur guette la marée…" />
 
   const { creneauActuel, prochaine, tendance, creneaux, niveau } = etat
   const prochainCreneau = creneaux.find((c) => c !== creneauActuel)

@@ -14,6 +14,7 @@ import CreerSortie from './pages/CreerSortie'
 import Vagues from './components/Vagues'
 import BarreNavigation from './components/BarreNavigation'
 import Chargement from './components/Chargement'
+import { DUREE_ECRAN_ACCUEIL, useDelaiMinimum } from './useDelaiMinimum'
 // Le lecteur de QR code est lourd : il n'est chargé qu'au moment de la pesée.
 const Pesee = lazy(() => import('./pages/Pesee'))
 
@@ -30,6 +31,8 @@ export default function App() {
   const [declarer, setDeclarer] = useState(false)
   const [pesee, setPesee] = useState<number | null>(null)
   const [page, setPage] = useState<Page>('accueil')
+  // Écran de démarrage : le raton laveur balaie au moins DUREE_ECRAN_ACCUEIL ms.
+  const demarrageFini = useDelaiMinimum(DUREE_ECRAN_ACCUEIL)
   const [vitrine, setVitrine] = useState(false) // catalogue visible sans être connecté
 
   // Suit la session : appelé au démarrage, puis à chaque connexion ou déconnexion.
@@ -68,7 +71,7 @@ export default function App() {
     if (!supabase) {
       return <p className="erreur">Supabase non configuré : copiez .env.example en .env.local et remplissez-le.</p>
     }
-    if (session === undefined) return <Chargement />
+    if (!demarrageFini || session === undefined) return <Chargement duree={DUREE_ECRAN_ACCUEIL} />
     if (session === null) {
       return vitrine ? (
         <Catalogue client={supabase} points={null} onRetour={() => setVitrine(false)} />
