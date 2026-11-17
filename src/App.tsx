@@ -13,6 +13,8 @@ import MesBons from './pages/MesBons'
 import Sorties from './pages/Sorties'
 import CreerSortie from './pages/CreerSortie'
 import Vagues from './components/Vagues'
+import PluieFete from './components/PluieFete'
+import Jeu from './pages/Jeu'
 import BarreNavigation from './components/BarreNavigation'
 import Chargement from './components/Chargement'
 import { DUREE_ECRAN_ACCUEIL, useDelaiMinimum } from './useDelaiMinimum'
@@ -20,7 +22,7 @@ import { DUREE_ECRAN_ACCUEIL, useDelaiMinimum } from './useDelaiMinimum'
 const Pesee = lazy(() => import('./pages/Pesee'))
 
 // Pages accessibles depuis l'accueil.
-export type Page = 'accueil' | 'classement' | 'catalogue' | 'bons' | 'sorties' | 'creer-sortie'
+export type Page = 'accueil' | 'classement' | 'catalogue' | 'bons' | 'sorties' | 'creer-sortie' | 'jeu'
 
 // Choisit l'écran à afficher : connexion, création du profil ou accueil.
 // Convention : `undefined` = pas encore chargé, `null` = n'existe pas.
@@ -34,8 +36,10 @@ export default function App() {
   const [page, setPage] = useState<Page>('accueil')
   // Écran de démarrage : le raton laveur balaie au moins DUREE_ECRAN_ACCUEIL ms.
   const demarrageFini = useDelaiMinimum(DUREE_ECRAN_ACCUEIL)
-  const [vitrine, setVitrine] = useState(false)
-  const [recuperation, setRecuperation] = useState(false) // catalogue visible sans être connecté
+  const [vitrine, setVitrine] = useState(false) // catalogue visible sans être connecté
+  const [recuperation, setRecuperation] = useState(false)
+  const [felicitations, setFelicitations] = useState<string | null>(null)
+  const finFelicitations = useCallback(() => setFelicitations(null), []) // pluie de déchets après une déclaration
 
   // Suit la session : appelé au démarrage, puis à chaque connexion ou déconnexion.
   useEffect(() => {
@@ -115,7 +119,10 @@ export default function App() {
         <Declarer
           client={supabase}
           userId={session.user.id}
-          onTermine={() => setDeclarer(false)}
+          onTermine={() => {
+            setDeclarer(false)
+            setFelicitations('Ramassage déclaré ! Le raton laveur danse de joie 🦝💃')
+          }}
           onAnnuler={() => setDeclarer(false)}
         />
       )
@@ -133,6 +140,9 @@ export default function App() {
     }
     if (page === 'creer-sortie') {
       return <CreerSortie client={supabase} moi={profil} onTermine={() => setPage('sorties')} onAnnuler={() => setPage('sorties')} />
+    }
+    if (page === 'jeu') {
+      return <Jeu onRetour={() => setPage('accueil')} />
     }
     if (page === 'bons') {
       return <MesBons client={supabase} onRetour={() => setPage('accueil')} />
@@ -163,6 +173,7 @@ export default function App() {
           {contenu()}
         </div>
       </main>
+      {felicitations && <PluieFete texte={felicitations} onFin={finFelicitations} />}
       {navigationVisible && <BarreNavigation page={page} onPage={setPage} />}
     </>
   )

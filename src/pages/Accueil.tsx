@@ -63,6 +63,15 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
 
       <Maree />
 
+      <button type="button" className="carte raccourci jeu-raccourci" onClick={() => onPage('jeu')}>
+        <span className="raccourci-icone" aria-hidden="true">🎮</span>
+        <span>
+          <strong>Le défi du raton</strong>
+          <small>Attrape les déchets, épargne les poissons. Record à battre !</small>
+        </span>
+        <span aria-hidden="true">›</span>
+      </button>
+
       <button type="button" className="carte raccourci" onClick={() => onPage('sorties')}>
         <span className="raccourci-icone" aria-hidden="true">📅</span>
         <span>

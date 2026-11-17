@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { niveauPour } from '../fun/niveaux'
 import Confettis from './Confettis'
+import { jouer } from '../fun/sons'
 
 const CLE = 'radon-dernier-niveau'
 
@@ -14,7 +15,10 @@ export default function Niveau({ points }: { points: number }) {
   useEffect(() => {
     try {
       const garde = localStorage.getItem(CLE)
-      if (garde !== null && index > Number(garde)) setFete(true)
+      if (garde !== null && index > Number(garde)) {
+        setFete(true)
+        jouer('fanfare')
+      }
       localStorage.setItem(CLE, String(index))
     } catch {
       /* navigation privée : pas de fête, tant pis */
