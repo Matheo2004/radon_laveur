@@ -45,6 +45,9 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
         <button type="button" className="secondaire" onClick={() => onPage('classement')}>
           🏆 Classement
         </button>
+        <button type="button" className="secondaire" onClick={() => onPage('catalogue')}>
+          🎁 Bons d'achat
+        </button>
       </nav>
 
       <h2>Mes ramassages</h2>

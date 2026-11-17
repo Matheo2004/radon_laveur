@@ -7,11 +7,12 @@ import ProfilForm from './pages/ProfilForm'
 import Accueil from './pages/Accueil'
 import Declarer from './pages/Declarer'
 import Classement from './pages/Classement'
+import Catalogue from './pages/Catalogue'
 // Le lecteur de QR code est lourd : il n'est chargé qu'au moment de la pesée.
 const Pesee = lazy(() => import('./pages/Pesee'))
 
 // Pages accessibles depuis l'accueil.
-export type Page = 'accueil' | 'classement'
+export type Page = 'accueil' | 'classement' | 'catalogue'
 
 // Choisit l'écran à afficher : connexion, création du profil ou accueil.
 // Convention : `undefined` = pas encore chargé, `null` = n'existe pas.
@@ -98,6 +99,9 @@ export default function App() {
     }
     if (page === 'classement') {
       return <Classement client={supabase} moi={profil} onRetour={() => setPage('accueil')} />
+    }
+    if (page === 'catalogue') {
+      return <Catalogue client={supabase} points={profil.points} onRetour={() => setPage('accueil')} />
     }
     return (
       <Accueil
