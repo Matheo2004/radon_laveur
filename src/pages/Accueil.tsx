@@ -5,6 +5,9 @@ import type { Profil } from '../types'
 import type { Page } from '../App'
 import MesDeclarations from './MesDeclarations'
 import Maree from './Maree'
+import Niveau from '../components/Niveau'
+import Mascotte from '../components/Mascotte'
+import Trophees from '../components/Trophees'
 
 type Props = {
   client: SupabaseClient
@@ -54,6 +57,10 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
       </section>
 
 
+      <Mascotte pseudo={profil.pseudo} />
+
+      <Niveau points={profil.points} />
+
       <Maree />
 
       <button type="button" className="carte raccourci" onClick={() => onPage('sorties')}>
@@ -64,6 +71,8 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onPese
         </span>
         <span aria-hidden="true">›</span>
       </button>
+
+      <Trophees client={client} userId={profil.id} points={profil.points} />
 
       <h2>Mes ramassages</h2>
       <MesDeclarations client={client} userId={profil.id} onPeser={onPeser} />
