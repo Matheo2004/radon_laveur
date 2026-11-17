@@ -13,6 +13,7 @@ import Sorties from './pages/Sorties'
 import CreerSortie from './pages/CreerSortie'
 import Vagues from './components/Vagues'
 import BarreNavigation from './components/BarreNavigation'
+import Chargement from './components/Chargement'
 // Le lecteur de QR code est lourd : il n'est chargé qu'au moment de la pesée.
 const Pesee = lazy(() => import('./pages/Pesee'))
 
@@ -67,7 +68,7 @@ export default function App() {
     if (!supabase) {
       return <p className="erreur">Supabase non configuré : copiez .env.example en .env.local et remplissez-le.</p>
     }
-    if (session === undefined) return <p className="aide">Chargement…</p>
+    if (session === undefined) return <Chargement />
     if (session === null) {
       return vitrine ? (
         <Catalogue client={supabase} points={null} onRetour={() => setVitrine(false)} />
@@ -76,7 +77,7 @@ export default function App() {
       )
     }
     if (erreurProfil) return <p className="erreur">Impossible de charger le profil : {erreurProfil}</p>
-    if (profil === undefined) return <p className="aide">Chargement du profil…</p>
+    if (profil === undefined) return <Chargement texte="Le raton laveur range ton profil…" />
 
     if (profil === null || edition) {
       return (
@@ -94,7 +95,7 @@ export default function App() {
     }
     if (pesee !== null) {
       return (
-        <Suspense fallback={<p className="aide">Ouverture du lecteur de QR code…</p>}>
+        <Suspense fallback={<Chargement texte="Ouverture du lecteur de QR code…" />}>
           <Pesee client={supabase} declarationId={pesee} onTermine={() => setPesee(null)} />
         </Suspense>
       )

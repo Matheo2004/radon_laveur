@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import Chargement from '../components/Chargement'
 
 type Echange = {
   id: number
@@ -28,7 +29,7 @@ export default function MesBons({ client, onRetour }: { client: SupabaseClient; 
     <section className="carte">
       <h2>Mes bons</h2>
       {erreur && <p className="erreur">Impossible de charger tes bons : {erreur}</p>}
-      {echanges === null && !erreur && <p className="aide">Chargement…</p>}
+      {echanges === null && !erreur && <Chargement texte="Le raton laveur cherche tes bons…" />}
       {echanges?.length === 0 && <p className="aide">Pas encore de bon : échange tes points dans « Bons d'achat ».</p>}
       <ul className="catalogue">
         {echanges?.map((e) => (

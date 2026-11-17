@@ -561,3 +561,35 @@ textarea { resize: vertical; }
   }
   .confettis { display: none; }
 }
+
+/* --------------------------------------------------------------------------
+   Chargement : le raton laveur qui passe le balai
+   -------------------------------------------------------------------------- */
+.chargement { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 0; color: var(--texte-doux); text-align: center; }
+.chargement p { margin: 0; font-size: 0.95rem; font-weight: 600; animation: clignote 1.6s ease-in-out infinite; }
+.raton { width: min(240px, 80%); height: auto; overflow: visible; }
+.raton-sable { fill: #f3e2c4; }
+.raton-corps { animation: dandine 0.6s ease-in-out infinite; transform-origin: 80px 96px; }
+.raton-tete { animation: hoche 1.2s ease-in-out infinite; transform-origin: 104px 58px; }
+.raton-queue { animation: fretille 0.9s ease-in-out infinite; transform-origin: 58px 70px; }
+.raton-patte.pa1 { animation: pas 0.6s ease-in-out infinite; transform-origin: 70px 86px; }
+.raton-patte.pa2 { animation: pas 0.6s ease-in-out infinite reverse; transform-origin: 92px 86px; }
+.raton-oeil { animation: cligne 3.2s infinite; transform-origin: center; transform-box: fill-box; }
+.raton-balai { animation: balaie 0.6s ease-in-out infinite; transform-origin: 122px 60px; }
+.raton-poussiere circle { fill: #e7d3ae; opacity: 0; transform-box: fill-box; transform-origin: center; animation: poussiere 1.2s ease-out infinite; }
+.raton-poussiere .p2 { animation-delay: 0.2s; }
+.raton-poussiere .p3 { animation-delay: 0.4s; }
+.raton-dechets .dechet { animation: arrive 2.4s linear infinite; }
+.dechet.d1 { fill: var(--bleu-clair); }
+.dechet.d2 { fill: var(--orange); animation-delay: 0.8s; }
+.dechet.d3 { fill: var(--vert); animation-delay: 1.6s; }
+
+@keyframes dandine { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-2px) rotate(1deg); } }
+@keyframes hoche { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg); } }
+@keyframes fretille { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(8deg); } }
+@keyframes pas { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
+@keyframes cligne { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes balaie { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(10deg); } }
+@keyframes poussiere { 0% { opacity: 0; transform: scale(0.4) translate(0, 0); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: scale(1.6) translate(8px, -10px); } }
+@keyframes arrive { 0% { transform: translateX(0); opacity: 1; } 70% { transform: translateX(-46px); opacity: 1; } 100% { transform: translateX(-60px) translateY(-14px) rotate(-90deg); opacity: 0; } }
+@keyframes clignote { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
