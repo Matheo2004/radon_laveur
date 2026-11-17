@@ -1,29 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Profil } from '../types'
-
-type Zone = { code: string; nom: string; commune: string }
+import MesDeclarations from './MesDeclarations'
 
 type Props = {
   client: SupabaseClient
   profil: Profil
   onModifier: () => void
+  onDeclarer: () => void
+  onRafraichir: () => void
 }
 
-export default function Accueil({ client, profil, onModifier }: Props) {
-  const [zones, setZones] = useState<Zone[]>([])
-  const [erreur, setErreur] = useState<string | null>(null)
-
+export default function Accueil({ client, profil, onModifier, onDeclarer, onRafraichir }: Props) {
+  // Recharge le profil à chaque retour sur l'accueil : les points ont pu être crédités entre-temps.
   useEffect(() => {
-    client
-      .from('zone')
-      .select('code, nom, commune')
-      .order('code')
-      .then(({ data, error }) => {
-        if (error) setErreur(error.message)
-        else setZones(data ?? [])
-      })
-  }, [client])
+    onRafraichir()
+  }, [onRafraichir])
 
   return (
     <>
@@ -35,6 +27,9 @@ export default function Accueil({ client, profil, onModifier }: Props) {
         <p className="points">
           <strong>{profil.points}</strong> pts
         </p>
+        <button type="button" className="declarer" onClick={onDeclarer}>
+          Déclarer un ramassage
+        </button>
         <button type="button" className="secondaire" onClick={onModifier}>
           Modifier mon profil
         </button>
@@ -43,15 +38,8 @@ export default function Accueil({ client, profil, onModifier }: Props) {
         </button>
       </section>
 
-      <h2>Zones du littoral ({zones.length})</h2>
-      {erreur && <p className="erreur">{erreur}</p>}
-      <ul className="zones">
-        {zones.map((z) => (
-          <li key={z.code}>
-            <strong>{z.code}</strong> {z.nom}
-          </li>
-        ))}
-      </ul>
+      <h2>Mes ramassages</h2>
+      <MesDeclarations client={client} userId={profil.id} />
     </>
   )
 }

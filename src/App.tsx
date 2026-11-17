@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { COLONNES_PROFIL, type Profil } from './types'
 import Connexion from './pages/Connexion'
 import ProfilForm from './pages/ProfilForm'
 import Accueil from './pages/Accueil'
+import Declarer from './pages/Declarer'
 
 // Choisit l'écran à afficher : connexion, création du profil ou accueil.
 // Convention : `undefined` = pas encore chargé, `null` = n'existe pas.
@@ -13,6 +14,7 @@ export default function App() {
   const [profil, setProfil] = useState<Profil | null | undefined>(undefined)
   const [erreurProfil, setErreurProfil] = useState<string | null>(null)
   const [edition, setEdition] = useState(false)
+  const [declarer, setDeclarer] = useState(false)
 
   // Suit la session : appelé au démarrage, puis à chaque connexion ou déconnexion.
   useEffect(() => {
@@ -23,13 +25,8 @@ export default function App() {
 
   // Charge le profil de l'utilisateur connecté (null s'il ne l'a pas encore créé).
   const userId = session?.user.id
-  useEffect(() => {
-    setEdition(false)
-    setErreurProfil(null)
-    if (!supabase || !userId) {
-      setProfil(undefined)
-      return
-    }
+  const chargerProfil = useCallback(() => {
+    if (!supabase || !userId) return
     supabase
       .from('profil')
       .select(COLONNES_PROFIL)
@@ -40,6 +37,14 @@ export default function App() {
         else setProfil(data)
       })
   }, [userId])
+
+  useEffect(() => {
+    setEdition(false)
+    setDeclarer(false)
+    setErreurProfil(null)
+    if (!userId) setProfil(undefined)
+    else chargerProfil()
+  }, [userId, chargerProfil])
 
   function contenu() {
     if (!supabase) {
@@ -64,7 +69,25 @@ export default function App() {
         />
       )
     }
-    return <Accueil client={supabase} profil={profil} onModifier={() => setEdition(true)} />
+    if (declarer) {
+      return (
+        <Declarer
+          client={supabase}
+          userId={session.user.id}
+          onTermine={() => setDeclarer(false)}
+          onAnnuler={() => setDeclarer(false)}
+        />
+      )
+    }
+    return (
+      <Accueil
+        client={supabase}
+        profil={profil}
+        onModifier={() => setEdition(true)}
+        onDeclarer={() => setDeclarer(true)}
+        onRafraichir={chargerProfil}
+      />
+    )
   }
 
   return (
