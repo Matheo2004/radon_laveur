@@ -2,7 +2,9 @@
 
 Ramassons main dans la main. Application web mobile (PWA) qui transforme chaque ramassage de déchets sur le littoral de la rade de Brest en points et en bons d'achat financés par la ville.
 
-Pile technique : React + Vite + TypeScript, Supabase (authentification, PostgreSQL, stockage des photos), Vercel, GitHub Actions.
+Pile technique : React + Vite + TypeScript, Supabase (authentification, PostgreSQL, stockage des photos), GitHub Actions et GitHub Pages.
+
+Application en ligne : https://matheo2004.github.io/radon_laveur/ (redéployée automatiquement à chaque fusion sur `main`).
 
 ## Démarrer en local
 

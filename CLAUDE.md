@@ -7,7 +7,8 @@ Projet étudiant M2 (gestion de projet Scrum). Application web mobile (PWA) : un
 - React 18 + Vite + TypeScript strict (`src/`)
 - Supabase : authentification, PostgreSQL, stockage des photos (bucket `photos`). Client dans `src/supabase.ts`, variables `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` dans `.env.local` (jamais commité)
 - Schéma : `supabase/schema.sql` (tables zone, profil, point_collecte, declaration, bon_achat, echange, avec RLS). Données : `supabase/seed_zones.sql`
-- Hébergement Vercel, CI GitHub Actions (`npm run lint` puis `npm run build`)
+- Hébergement GitHub Pages (https://matheo2004.github.io/radon_laveur/) : le workflow `.github/workflows/deploy.yml` publie l'app à chaque fusion sur `main`, avec `BASE_PATH=/radon_laveur/` et les variables du dépôt `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`. Remplace Vercel prévu au TD1 (décision du sprint 1)
+- CI GitHub Actions (`npm run lint` puis `npm run build`)
 - Lecture QR : bibliothèque `html5-qrcode`. Géolocalisation : API du navigateur. Pas de carte dans le MVP (US02 hors MVP)
 
 ## Commandes
