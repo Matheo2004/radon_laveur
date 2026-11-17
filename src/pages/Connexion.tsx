@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { AuthError, SupabaseClient } from '@supabase/supabase-js'
 import MentionInformation, { VERSION_MENTION } from './MentionInformation'
 
-type Mode = 'connexion' | 'inscription'
+type Mode = 'connexion' | 'inscription' | 'oubli'
 
 // Traduit les erreurs de Supabase Auth en messages compréhensibles.
 function messageErreur(error: AuthError): string {
@@ -48,7 +48,16 @@ export default function Connexion({ client, onVoirRecompenses }: { client: Supab
     if (mode === 'inscription' && !accepte) return setErreur("Lis et accepte la mention d'information pour créer ton compte.")
     setEnvoi(true)
 
-    if (mode === 'connexion') {
+    if (mode === 'oubli') {
+      // US17 : Supabase envoie un lien de réinitialisation ; en cliquant dessus, l'étudiant revient sur l'app
+      // et App affiche l'écran « Nouveau mot de passe » (évènement PASSWORD_RECOVERY).
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + import.meta.env.BASE_URL,
+      })
+      if (error) setErreur(messageErreur(error))
+      // Même message si l'adresse n'existe pas : on ne révèle pas qui a un compte.
+      else setInfo('Si un compte existe avec cette adresse, un e-mail vient de partir. Clique sur le lien pour choisir un nouveau mot de passe.')
+    } else if (mode === 'connexion') {
       // En cas de succès, App reçoit la nouvelle session et change d'écran.
       const { error } = await client.auth.signInWithPassword({ email, password: motDePasse })
       if (error) setErreur(messageErreur(error))
@@ -75,26 +84,35 @@ export default function Connexion({ client, onVoirRecompenses }: { client: Supab
 
   return (
     <section className="carte">
-      <div className="onglets" role="tablist">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === 'connexion'}
-          className={mode === 'connexion' ? 'actif' : ''}
-          onClick={() => changerMode('connexion')}
-        >
-          Connexion
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === 'inscription'}
-          className={mode === 'inscription' ? 'actif' : ''}
-          onClick={() => changerMode('inscription')}
-        >
-          Inscription
-        </button>
-      </div>
+      {mode !== 'oubli' && (
+        <div className="onglets" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'connexion'}
+            className={mode === 'connexion' ? 'actif' : ''}
+            onClick={() => changerMode('connexion')}
+          >
+            Connexion
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'inscription'}
+            className={mode === 'inscription' ? 'actif' : ''}
+            onClick={() => changerMode('inscription')}
+          >
+            Inscription
+          </button>
+        </div>
+      )}
+
+      {mode === 'oubli' && (
+        <>
+          <h2>Mot de passe oublié</h2>
+          <p className="aide">Indique ton e-mail : tu recevras un lien pour choisir un nouveau mot de passe.</p>
+        </>
+      )}
 
       <form onSubmit={valider}>
         <label>
@@ -108,17 +126,19 @@ export default function Connexion({ client, onVoirRecompenses }: { client: Supab
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-        <label>
-          Mot de passe
-          <input
-            type="password"
-            autoComplete={mode === 'connexion' ? 'current-password' : 'new-password'}
-            minLength={6}
-            required
-            value={motDePasse}
-            onChange={(e) => setMotDePasse(e.target.value)}
-          />
-        </label>
+        {mode !== 'oubli' && (
+          <label>
+            Mot de passe
+            <input
+              type="password"
+              autoComplete={mode === 'connexion' ? 'current-password' : 'new-password'}
+              minLength={6}
+              required
+              value={motDePasse}
+              onChange={(e) => setMotDePasse(e.target.value)}
+            />
+          </label>
+        )}
         {mode === 'inscription' && (
           <>
             <p className="aide">6 caractères minimum.</p>
@@ -134,9 +154,19 @@ export default function Connexion({ client, onVoirRecompenses }: { client: Supab
         {info && <p className="info" role="status">{info}</p>}
 
         <button type="submit" className="principal" disabled={envoi}>
-          {envoi ? 'Patiente…' : mode === 'connexion' ? 'Se connecter' : 'Créer mon compte'}
+          {envoi ? 'Patiente…' : mode === 'connexion' ? 'Se connecter' : mode === 'inscription' ? 'Créer mon compte' : 'Recevoir le lien'}
         </button>
       </form>
+      {mode === 'connexion' && (
+        <button type="button" className="lien" onClick={() => changerMode('oubli')}>
+          Mot de passe oublié ?
+        </button>
+      )}
+      {mode === 'oubli' && (
+        <button type="button" className="lien" onClick={() => changerMode('connexion')}>
+          ← Retour à la connexion
+        </button>
+      )}
       <button type="button" className="lien" onClick={onVoirRecompenses}>
         🎁 Voir les récompenses à gagner
       </button>

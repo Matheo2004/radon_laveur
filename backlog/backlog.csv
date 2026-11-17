@@ -16,7 +16,7 @@ rang,id,titre,histoire,points,moscow,sprint
 15,US11,Défis et badges,"En tant qu'étudiant, je veux relever des défis et gagner des badges, afin de rester motivé.",5,Could,
 16,US16,Sorties créées par les associations,"En tant qu'association, je veux créer une sortie et recruter des bénévoles, afin d'organiser mes sorties et gagner en visibilité.",5,Could,
 17,US15,Version simplifiée pour les retraités,"En tant que retraité, je veux une version simplifiée de l'application, afin de participer sans difficulté.",8,Could,
-18,US17,Mot de passe oublié,"En tant qu'étudiant, je veux réinitialiser mon mot de passe par e-mail, afin de retrouver l'accès à mon compte.",,À prioriser,
+18,US17,Mot de passe oublié,"En tant qu'étudiant, je veux réinitialiser mon mot de passe par e-mail, afin de retrouver l'accès à mon compte.",1,Should,3
 19,US18,Compte administrateur association,"En tant que référent d'association, je veux un compte administrateur, afin de valider les pesées et gérer les sorties de mon association.",,À prioriser,
 20,US19,Liste des associations,"En tant qu'étudiant, je veux voir la liste des associations partenaires, afin de les découvrir et de les rejoindre.",,À prioriser,
 21,US20,Notifications selon le lieu de résidence,"En tant qu'étudiant, je veux indiquer mon lieu de résidence, afin d'être prévenu des sorties de ramassage près de chez moi.",,À prioriser,

@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { COLONNES_PROFIL, type Profil } from './types'
 import Connexion from './pages/Connexion'
+import NouveauMotDePasse from './pages/NouveauMotDePasse'
 import ProfilForm from './pages/ProfilForm'
 import Accueil from './pages/Accueil'
 import Declarer from './pages/Declarer'
@@ -33,12 +34,17 @@ export default function App() {
   const [page, setPage] = useState<Page>('accueil')
   // Écran de démarrage : le raton laveur balaie au moins DUREE_ECRAN_ACCUEIL ms.
   const demarrageFini = useDelaiMinimum(DUREE_ECRAN_ACCUEIL)
-  const [vitrine, setVitrine] = useState(false) // catalogue visible sans être connecté
+  const [vitrine, setVitrine] = useState(false)
+  const [recuperation, setRecuperation] = useState(false) // catalogue visible sans être connecté
 
   // Suit la session : appelé au démarrage, puis à chaque connexion ou déconnexion.
   useEffect(() => {
     if (!supabase) return
-    const { data } = supabase.auth.onAuthStateChange((_evenement, nouvelle) => setSession(nouvelle))
+    const { data } = supabase.auth.onAuthStateChange((evenement, nouvelle) => {
+      setSession(nouvelle)
+      // Arrivée par le lien « mot de passe oublié » : on affiche l'écran du nouveau mot de passe (US17).
+      if (evenement === 'PASSWORD_RECOVERY') setRecuperation(true)
+    })
     return () => data.subscription.unsubscribe()
   }, [])
 
@@ -79,6 +85,7 @@ export default function App() {
         <Connexion client={supabase} onVoirRecompenses={() => setVitrine(true)} />
       )
     }
+    if (recuperation) return <NouveauMotDePasse client={supabase} onTermine={() => setRecuperation(false)} />
     if (erreurProfil) return <p className="erreur">Impossible de charger le profil : {erreurProfil}</p>
     if (profil === undefined) return <Chargement texte="Le raton laveur range ton profil…" />
 
@@ -144,9 +151,9 @@ export default function App() {
   }
 
   // La barre du bas n'apparaît que sur les pages principales (pas pendant une déclaration, une pesée ou l'édition du profil).
-  const navigationVisible = Boolean(session && profil && !edition && !declarer && pesee === null && page !== 'creer-sortie')
+  const navigationVisible = Boolean(session && profil && !recuperation && !edition && !declarer && pesee === null && page !== 'creer-sortie')
   // Clé de l'écran affiché : quand elle change, l'écran rejoue son animation d'entrée.
-  const ecran = !session ? (vitrine ? 'vitrine' : 'connexion') : edition || !profil ? 'profil' : pesee !== null ? 'pesee' : declarer ? 'declarer' : page
+  const ecran = recuperation ? 'recuperation' : !session ? (vitrine ? 'vitrine' : 'connexion') : edition || !profil ? 'profil' : pesee !== null ? 'pesee' : declarer ? 'declarer' : page
 
   return (
     <>
