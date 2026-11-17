@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QR code – point de collecte Radon Laveur</title>
+  <style>
+    body { font-family: system-ui, sans-serif; color: #12303f; background: #f4f9fb; margin: 0; }
+    main { max-width: 640px; margin: 24px auto; padding: 24px; background: #fff; border-radius: 16px; text-align: center; }
+    h1 { color: #0b4f6c; margin: 0 0 4px; }
+    #qr { display: inline-block; padding: 16px; background: #fff; }
+    .code { font-family: monospace; font-size: 1.2rem; letter-spacing: 1px; }
+    @media print { body { background: #fff; } main { margin: 0 auto; } .aide { display: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Radon Laveur</h1>
+    <p>Point de collecte : stand de l'association (balance mobile)</p>
+    <div id="qr"></div>
+    <p class="code">RL-PC-ASSO-01</p>
+    <p>Scannez ce QR code dans l'application, puis saisissez le poids affiché par la balance.</p>
+    <p class="aide">Ouvrir ce fichier dans un navigateur puis Ctrl+P pour l'imprimer. Le texte du QR code doit rester exactement « RL-PC-ASSO-01 » (table point_collecte).</p>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    new QRCode(document.getElementById('qr'), { text: 'RL-PC-ASSO-01', width: 320, height: 320, correctLevel: QRCode.CorrectLevel.M })
+  </script>
+</body>
+</html>

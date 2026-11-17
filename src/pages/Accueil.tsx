@@ -8,10 +8,11 @@ type Props = {
   profil: Profil
   onModifier: () => void
   onDeclarer: () => void
+  onPeser: (declarationId: number) => void
   onRafraichir: () => void
 }
 
-export default function Accueil({ client, profil, onModifier, onDeclarer, onRafraichir }: Props) {
+export default function Accueil({ client, profil, onModifier, onDeclarer, onPeser, onRafraichir }: Props) {
   // Recharge le profil à chaque retour sur l'accueil : les points ont pu être crédités entre-temps.
   useEffect(() => {
     onRafraichir()
@@ -39,7 +40,7 @@ export default function Accueil({ client, profil, onModifier, onDeclarer, onRafr
       </section>
 
       <h2>Mes ramassages</h2>
-      <MesDeclarations client={client} userId={profil.id} />
+      <MesDeclarations client={client} userId={profil.id} onPeser={onPeser} />
     </>
   )
 }

@@ -99,3 +99,9 @@ button.declarer { background: var(--orange); color: #fff; font-weight: 700; font
 .badge.en_attente { background: #fdebd9; color: #8a4a12; }
 .badge.validee { background: #dcf1e4; color: #1f6b41; }
 .badge.refusee { background: #f8dde1; color: #a3172b; }
+
+/* US07 : pesée par QR code */
+.lecteur { width: 100%; max-width: 320px; margin: 8px auto; border-radius: 12px; overflow: hidden; }
+button.peser { margin-top: 8px; min-height: 44px; width: auto; background: var(--vert); color: #fff; font-weight: 600; }
+.succes { text-align: center; }
+.succes .points strong { font-size: 2.6rem; }

@@ -15,7 +15,9 @@ const pointsAffiches = (poids: number | null) => Math.round((poids ?? 0) * 10)
 
 const LIBELLES = { en_attente: 'En attente de pesée', validee: 'Validée', refusee: 'Refusée' }
 
-export default function MesDeclarations({ client, userId }: { client: SupabaseClient; userId: string }) {
+type Props = { client: SupabaseClient; userId: string; onPeser: (declarationId: number) => void }
+
+export default function MesDeclarations({ client, userId, onPeser }: Props) {
   const [declarations, setDeclarations] = useState<Declaration[] | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
 
@@ -50,6 +52,11 @@ export default function MesDeclarations({ client, userId }: { client: SupabaseCl
               {LIBELLES[d.statut]}
               {d.statut === 'validee' && ` · ${d.poids_kg} kg · +${pointsAffiches(d.poids_kg)} pts`}
             </span>
+            {d.statut === 'en_attente' && (
+              <button type="button" className="peser" onClick={() => onPeser(d.id)}>
+                Faire peser (QR code)
+              </button>
+            )}
           </div>
         </li>
       ))}
