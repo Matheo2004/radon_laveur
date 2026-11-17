@@ -1,8 +1,18 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { nettoyerPhoto } from '../photo'
+import { chargerMaree, heure, jour, type Etat } from '../maree'
 
-type Zone = { id: number; code: string; nom: string; commune: string; latitude: number; longitude: number; longueur_km: number | null }
+type Zone = {
+  id: number
+  code: string
+  nom: string
+  commune: string
+  latitude: number
+  longitude: number
+  longueur_km: number | null
+  maree_basse?: boolean // absent tant que la migration 012 n'est pas appliquée
+}
 type Position = { latitude: number; longitude: number; precision: number }
 
 // Même règle que la base (verifier_position) : demi-longueur de la zone + 500 m autour de son centre.
@@ -37,6 +47,11 @@ export default function Declarer({ client, userId, onTermine, onAnnuler }: Props
   const [erreur, setErreur] = useState<string | null>(null)
   const [position, setPosition] = useState<Position | null>(null)
   const [erreurGps, setErreurGps] = useState<string | null>(null)
+  const [maree, setMaree] = useState<Etat | null>(null)
+
+  useEffect(() => {
+    chargerMaree().then(setMaree).catch(() => undefined) // sans marée, on déclare quand même
+  }, [])
 
   // Demande la position dès l'ouverture de l'écran (le navigateur demande l'autorisation la première fois).
   useEffect(() => {
@@ -70,7 +85,7 @@ export default function Declarer({ client, userId, onTermine, onAnnuler }: Props
   useEffect(() => {
     client
       .from('zone')
-      .select('id, code, nom, commune, latitude, longitude, longueur_km')
+      .select('*')
       .order('code')
       .then(({ data, error }) => {
         if (error) setErreur(`Impossible de charger les zones : ${error.message}`)
@@ -166,6 +181,19 @@ export default function Declarer({ client, userId, onTermine, onAnnuler }: Props
             ))}
           </select>
         </label>
+
+        {(() => {
+          // Conseil de marée pour la zone choisie (zones de plage ou de grève).
+          const zone = zones.find((z) => String(z.id) === zoneId)
+          if (!zone || zone.maree_basse !== true || !maree || maree.creneauActuel) return null
+          const prochain = maree.creneaux[0]
+          return (
+            <p className="info">
+              🌊 Cette zone se ramasse mieux à marée basse
+              {prochain && <> : prochain créneau {jour(prochain.debut)} de {heure(prochain.debut)} à {heure(prochain.fin)}</>}.
+            </p>
+          )
+        })()}
 
         <p className={erreurGps ? 'erreur' : 'aide'} role="status">
           {erreurGps ?? (position ? `Position GPS obtenue (précision ± ${position.precision} m)` : 'Recherche de ta position GPS…')}

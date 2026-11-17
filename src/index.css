@@ -136,3 +136,14 @@ label.case input { width: 22px; height: 22px; min-height: 0; flex-shrink: 0; }
 /* US13 : échange de points */
 .code-bon { font-family: ui-monospace, monospace; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; color: var(--bleu); margin: 6px 0; }
 .catalogue button.peser { width: 100%; }
+
+/* Marées */
+.maree h3 { font-size: 1rem; margin: 12px 0 6px; color: var(--bleu); }
+.maree-etat { font-weight: 600; padding: 8px 12px; border-radius: 8px; margin: 0 0 8px; }
+.maree-etat.bon { background: #dcf1e4; color: #1f6b41; }
+.maree-etat.attendre { background: #e6f0f5; color: var(--bleu); }
+.creneaux { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.creneaux li { display: flex; gap: 8px; align-items: baseline; }
+.creneaux li span { min-width: 92px; color: #4a6573; }
+.creneaux li.nuit { opacity: 0.6; }
+.source { font-size: 0.75rem; margin-top: 8px; }
